@@ -42,9 +42,15 @@ This is the backend server for the Sports Betting Platform.
 
 5. Seed the database with initial data:
    ```
-   npm run seed       # Seed sports, events, and users
-   npm run seed:bets  # Add sample bets (run after the main seed)
+   # FOR DEVELOPMENT/TESTING ONLY (DELETES ALL EXISTING DATA):
+   npm run seed       # Seed sports, events, and users (DESTRUCTIVE)
+   npm run seed:bets  # Add sample bets (DESTRUCTIVE)
+
+   # SAFE FOR ALL ENVIRONMENTS (NON-DESTRUCTIVE):
+   npm run seed:demo  # Add demo data without deleting existing records
    ```
+
+   ⚠️ **WARNING**: The `seed` and `seed:bets` scripts will DELETE ALL EXISTING DATA in the database. They should NEVER be used in production environments!
 
 ### Running the Server
 
@@ -61,7 +67,9 @@ npm start
 
 ## Seed Data
 
-The seed script populates the database with the following data:
+### Destructive Seed Scripts (Development/Testing Only)
+
+The destructive seed scripts populate the database with the following data:
 
 - **Users**:
   - Admin user (email: admin@example.com, password: admin123)
@@ -79,7 +87,27 @@ The seed script populates the database with the following data:
   - 3-5 random bets for each regular user
   - Various bet amounts, selections, and statuses (PENDING, WON, LOST)
 
-For more details about the seed data, see the [Prisma README](./prisma/README.md).
+### Non-Destructive Demo Seed (Safe for All Environments)
+
+The non-destructive demo seed script adds the following data without deleting existing records:
+
+- **Demo Users**:
+  - Demo Admin (email: demo.admin@example.com, password: demo123)
+  - 3 demo regular users (email: demo.user1@example.com through demo.user3@example.com, password: demo123)
+
+- **Demo Sports**:
+  - 3 demo sports (Demo Football, Demo Basketball, Demo Tennis)
+
+- **Demo Events**:
+  - 2 events per demo sport (6 events total)
+  - Events have different statuses (SCHEDULED, LIVE)
+  - Each event has participants with random odds
+
+- **Demo Bets**:
+  - 2 random bets for each demo user
+  - Various bet amounts, selections, and statuses (PENDING, WON, LOST)
+
+For more details about the seed data and scripts, see the [Prisma README](./prisma/README.md).
 
 ## API Endpoints
 

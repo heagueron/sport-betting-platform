@@ -12,6 +12,7 @@
     "test:coverage": "jest --coverage --detectOpenHandles --no-cache",
     "seed": "ts-node prisma/seed.ts",
     "seed:bets": "ts-node prisma/seedBets.ts",
+    "seed:demo": "ts-node prisma/seedDemo.ts",
     "db:seed": "prisma db seed"
   },
   "prisma": {

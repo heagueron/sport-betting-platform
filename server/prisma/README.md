@@ -1,6 +1,6 @@
-# Database Seed Script
+# Database Seed Scripts
 
-This directory contains a seed script that populates the database with initial data for development and testing purposes.
+This directory contains seed scripts that populate the database with initial data for development, testing, and demonstration purposes.
 
 ## What the Seed Script Creates
 
@@ -24,9 +24,11 @@ The seed script creates the following data:
 
 ## How to Run the Seed Scripts
 
-### Main Seed Script
+### ⚠️ WARNING: DESTRUCTIVE SEED SCRIPTS ⚠️
 
-You can run the main seed script using one of the following commands:
+The following scripts will **DELETE ALL EXISTING DATA** in the database before creating new data. They should **NEVER** be used in production environments!
+
+#### Main Seed Script (DESTRUCTIVE)
 
 ```bash
 # Using npm script
@@ -36,7 +38,7 @@ npm run seed
 npx prisma db seed
 ```
 
-### Bet Seed Script
+#### Bet Seed Script (DESTRUCTIVE)
 
 After running the main seed script, you can populate the database with sample bets using:
 
@@ -46,9 +48,25 @@ npm run seed:bets
 
 This will create 3-5 random bets for each regular user in the system.
 
+### ✅ NON-DESTRUCTIVE SEED SCRIPT (SAFE FOR PRODUCTION)
+
+The following script adds demo data without deleting existing records. It's safe to use in any environment, including production:
+
+```bash
+npm run seed:demo
+```
+
+This script:
+- Checks if demo data already exists before creating it
+- Adds clearly labeled demo data (prefixed with "Demo")
+- Never deletes existing data
+- Creates a smaller set of demo data (3 sports, 2 events per sport)
+
 ## Clearing Existing Data
 
-The seed script automatically clears all existing data from the database before creating new data. This ensures that you always start with a clean slate.
+The destructive seed scripts (`seed.ts` and `seedBets.ts`) automatically clear existing data from the database before creating new data. This ensures that you start with a clean slate in development and testing environments.
+
+The non-destructive seed script (`seedDemo.ts`) does NOT clear any existing data. It checks if demo data already exists before creating it, making it safe for all environments.
 
 ## Customizing the Seed Data
 

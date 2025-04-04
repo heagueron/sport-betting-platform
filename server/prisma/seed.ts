@@ -1,9 +1,41 @@
 import { PrismaClient, Role, EventStatus, Sport, User, Event } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import * as readline from 'readline';
 
 const prisma = new PrismaClient();
 
+// Check if we're in production environment
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Create readline interface for user confirmation
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
 async function main() {
+  // Safety check for production environment
+  if (isProduction) {
+    console.error('\x1b[31m%s\x1b[0m', 'ERROR: Seed script cannot be run in production environment!');
+    console.error('\x1b[31m%s\x1b[0m', 'This script would delete all existing data.');
+    console.error('\x1b[31m%s\x1b[0m', 'If you need to add demo data to production, use a non-destructive script instead.');
+    process.exit(1);
+  }
+
+  console.log('\x1b[33m%s\x1b[0m', '⚠️  WARNING: This script will DELETE ALL EXISTING DATA in the database!');
+  console.log('\x1b[33m%s\x1b[0m', '⚠️  It should only be used in development or testing environments.');
+
+  // Ask for confirmation
+  await new Promise<void>((resolve) => {
+    rl.question('Are you sure you want to continue? (yes/no): ', (answer) => {
+      if (answer.toLowerCase() !== 'yes') {
+        console.log('Seed operation cancelled.');
+        process.exit(0);
+      }
+      resolve();
+    });
+  });
+
   console.log('Starting seed...');
 
   // Clear existing data
@@ -19,7 +51,8 @@ async function main() {
   // Create events for each sport
   await createEvents(sports);
 
-  console.log('Seed completed successfully!');
+  console.log('\x1b[32m%s\x1b[0m', 'Seed completed successfully!');
+  rl.close();
 }
 
 async function clearDatabase() {
@@ -185,9 +218,13 @@ async function createParticipants(event: Event): Promise<void> {
 
 main()
   .catch((e) => {
+    console.error('\x1b[31m%s\x1b[0m', 'Error during seed operation:');
     console.error(e);
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
+    if (rl.close) {
+      rl.close();
+    }
   });
