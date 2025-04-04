@@ -217,10 +217,19 @@ export const deleteSport = async (
     const result = await deleteSportById(sportId);
 
     // Check if sport was deleted
-    if (!result) {
+    if (!result.success) {
+      // If sport has events, return 400
+      if (result.hasEvents) {
+        return res.status(400).json({
+          success: false,
+          error: 'Sport cannot be deleted because it has associated events'
+        });
+      }
+
+      // Otherwise, sport not found
       return res.status(404).json({
         success: false,
-        error: 'Sport not found or cannot be deleted because it has associated events'
+        error: 'Sport not found'
       });
     }
 

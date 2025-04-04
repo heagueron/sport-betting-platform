@@ -10,11 +10,14 @@ describe('Bet API', () => {
       const sport = await createSport({ name: 'Football' });
       const event = await createEvent(sport.id, { name: 'Event 1' });
 
+      // Get the first participant's name
+      const participant = event.participants[0];
+
       const betData = {
         eventId: event.id,
         amount: 10,
         odds: 1.5,
-        selection: 'Team A'
+        selection: participant.name
       };
 
       const response = await agent
@@ -53,11 +56,14 @@ describe('Bet API', () => {
       const sport = await createSport({ name: 'Football' });
       const event = await createEvent(sport.id, { name: 'Event 1' });
 
+      // Get the first participant's name
+      const participant = event.participants[0];
+
       const betData = {
         eventId: event.id,
         amount: 10,
         odds: 1.5,
-        selection: 'Team A'
+        selection: participant.name
       };
 
       const response = await agent
@@ -76,11 +82,14 @@ describe('Bet API', () => {
       const sport = await createSport({ name: 'Football' });
       const event = await createEvent(sport.id, { name: 'Event 1' });
 
+      // Get the first participant's name
+      const participant = event.participants[0];
+
       const betData = {
         eventId: event.id,
         amount: 10,
         odds: 1.5,
-        selection: 'Team A'
+        selection: participant.name
       };
 
       const response = await agent
@@ -101,11 +110,14 @@ describe('Bet API', () => {
       const sport = await createSport({ name: 'Football' });
       const event = await createEvent(sport.id, { name: 'Event 1' });
 
+      // Get the first participant's name
+      const participant = event.participants[0];
+
       // Missing amount
       const betData1 = {
         eventId: event.id,
         odds: 1.5,
-        selection: 'Team A'
+        selection: participant.name
       };
 
       const response1 = await agent
@@ -143,7 +155,7 @@ describe('Bet API', () => {
         eventId: '00000000-0000-0000-0000-000000000000',
         amount: 10,
         odds: 1.5,
-        selection: 'Team A'
+        selection: 'Any Team' // Doesn't matter for this test as the event doesn't exist
       };
 
       const response = await agent

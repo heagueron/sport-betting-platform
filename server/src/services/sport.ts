@@ -137,7 +137,7 @@ export const updateSportById = async (
  * @param sportId Sport ID
  * @returns Boolean indicating success
  */
-export const deleteSportById = async (sportId: string): Promise<boolean> => {
+export const deleteSportById = async (sportId: string): Promise<{ success: boolean; hasEvents?: boolean }> => {
   try {
     // Check if sport exists
     const sport = await prisma.sport.findUnique({
@@ -148,13 +148,13 @@ export const deleteSportById = async (sportId: string): Promise<boolean> => {
     });
 
     if (!sport) {
-      return false;
+      return { success: false };
     }
 
     // Check if sport has events
     if (sport.events.length > 0) {
       // Don't delete sport with events
-      return false;
+      return { success: false, hasEvents: true };
     }
 
     // Delete sport
@@ -162,9 +162,9 @@ export const deleteSportById = async (sportId: string): Promise<boolean> => {
       where: { id: sportId }
     });
 
-    return true;
+    return { success: true };
   } catch (error) {
     console.error('Error deleting sport:', error);
-    return false;
+    return { success: false };
   }
 };

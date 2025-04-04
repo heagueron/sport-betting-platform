@@ -67,15 +67,32 @@ export const generateToken = (user: User): string => {
  * @param overrides Optional overrides for sport properties
  * @returns Created sport
  */
+// Counter to ensure unique sport names
+let sportCounter = 0;
+
 export const createSport = async (overrides: any = {}): Promise<any> => {
-  // Generate a unique timestamp for this sport
-  const timestamp = Date.now() + Math.floor(Math.random() * 1000);
+  // Generate a unique identifier for this sport
+  sportCounter++;
+  const timestamp = Date.now();
+  const uniqueId = `${timestamp}-${sportCounter}-${Math.random().toString(36).substring(2, 7)}`;
+
+  // If name is provided in overrides, make it unique
+  let sportName = overrides.name || 'Test Sport';
+  if (!sportName.includes(uniqueId)) {
+    sportName = `${sportName} ${uniqueId}`;
+  }
+
+  // Create a slug from the name
+  const slug = sportName.toLowerCase().replace(/\s+/g, '-');
 
   const sportData = {
-    name: `Test Sport ${timestamp}`,
-    slug: `test-sport-${timestamp}`,
+    name: sportName,
+    slug,
     active: true,
-    ...overrides
+    ...overrides,
+    // Override name and slug again to ensure they're unique
+    name: sportName,
+    slug
   };
 
   return prisma.sport.create({
@@ -89,13 +106,29 @@ export const createSport = async (overrides: any = {}): Promise<any> => {
  * @param overrides Optional overrides for event properties
  * @returns Created event with participants
  */
+// Counter to ensure unique event names
+let eventCounter = 0;
+
 export const createEvent = async (sportId: string, overrides: any = {}): Promise<any> => {
+  // Generate a unique identifier for this event
+  eventCounter++;
+  const timestamp = Date.now();
+  const uniqueId = `${timestamp}-${eventCounter}-${Math.random().toString(36).substring(2, 7)}`;
+
+  // If name is provided in overrides, make it unique
+  let eventName = overrides.name || 'Test Event';
+  if (!eventName.includes(uniqueId)) {
+    eventName = `${eventName} ${uniqueId}`;
+  }
+
   const eventData = {
-    name: `Test Event ${Date.now()}`,
+    name: eventName,
     sportId,
     startTime: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
     status: 'SCHEDULED',
-    ...overrides
+    ...overrides,
+    // Override name again to ensure it's unique
+    name: eventName
   };
 
   // Create event
@@ -103,18 +136,18 @@ export const createEvent = async (sportId: string, overrides: any = {}): Promise
     data: eventData
   });
 
-  // Create participants
+  // Create participants with unique names
   const participants = await Promise.all([
     prisma.participant.create({
       data: {
-        name: 'Team A',
+        name: `Team A ${uniqueId}`,
         odds: 1.5,
         eventId: event.id
       }
     }),
     prisma.participant.create({
       data: {
-        name: 'Team B',
+        name: `Team B ${uniqueId}`,
         odds: 2.5,
         eventId: event.id
       }
@@ -132,16 +165,36 @@ export const createEvent = async (sportId: string, overrides: any = {}): Promise
  * @returns Created bet
  */
 export const createBet = async (userId: string, eventId: string, overrides: any = {}): Promise<any> => {
+  // Get the event to find the participant names
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: { participants: true }
+  });
+
+  if (!event || !event.participants || event.participants.length < 2) {
+    throw new Error('Event not found or has insufficient participants');
+  }
+
+  // Use the first participant's name as the default selection
+  const defaultSelection = event.participants[0].name;
+
   const betData = {
     userId,
     eventId,
     amount: 10,
     odds: 1.5,
-    selection: 'Team A',
+    selection: defaultSelection,
     potentialWinnings: 15,
     status: 'PENDING',
     ...overrides
   };
+
+  // If selection is 'Team A' or 'Team B' in overrides, replace with actual participant names
+  if (betData.selection === 'Team A' && event.participants[0].name.includes('Team A')) {
+    betData.selection = event.participants[0].name;
+  } else if (betData.selection === 'Team B' && event.participants[1].name.includes('Team B')) {
+    betData.selection = event.participants[1].name;
+  }
 
   return prisma.bet.create({
     data: betData
