@@ -13,6 +13,8 @@ import eventRoutes from './routes/event';
 
 // Import middleware
 import { errorHandler } from './middleware/error';
+import { requestLogger } from './middleware/logger';
+import { notFoundHandler } from './middleware/notFound';
 
 const app: Express = express();
 
@@ -23,7 +25,10 @@ app.use(cors());
 app.use(helmet());
 app.use(cookieParser());
 
-// Logging middleware
+// Request logging middleware
+app.use(requestLogger);
+
+// HTTP request logging (for development)
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
@@ -36,11 +41,14 @@ app.use('/api/sports', sportRoutes);
 app.use('/api/events', eventRoutes);
 
 // Health check route
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-// Error handling middleware
+// Not found middleware - should be after all routes
+app.use(notFoundHandler);
+
+// Error handling middleware - should be the last middleware
 app.use(errorHandler);
 
 export default app;
