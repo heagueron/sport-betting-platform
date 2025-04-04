@@ -7,7 +7,9 @@
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
-    "test": "jest --watchAll --no-cache"
+    "test": "jest --detectOpenHandles --no-cache --testTimeout=10000",
+    "test:watch": "jest --watch --detectOpenHandles --no-cache",
+    "test:coverage": "jest --coverage --detectOpenHandles --no-cache"
   },
   "keywords": [],
   "author": "",
