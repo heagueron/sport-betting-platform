@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  balance   Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bets      Bet[]
+
+  @@map("users")
+}
+
+model Sport {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  events    Event[]
+
+  @@map("sports")
+}
+
+model Event {
+  id          String     @id @default(uuid())
+  name        String
+  startTime   DateTime
+  endTime     DateTime?
+  status      EventStatus @default(SCHEDULED)
+  result      String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  sportId     String
+  sport       Sport      @relation(fields: [sportId], references: [id])
+
+  participants Participant[]
+  bets         Bet[]
+
+  @@map("events")
+}
+
+model Participant {
+  id        String   @id @default(uuid())
+  name      String
+  odds      Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id])
+
+  @@map("participants")
+}
+
+model Bet {
+  id               String   @id @default(uuid())
+  amount           Float
+  odds             Float
+  selection        String
+  status           BetStatus @default(PENDING)
+  potentialWinnings Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+
+  eventId          String
+  event            Event    @relation(fields: [eventId], references: [id])
+
+  @@map("bets")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum EventStatus {
+  SCHEDULED
+  LIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum BetStatus {
+  PENDING
+  WON
+  LOST
+  CANCELLED
+}
