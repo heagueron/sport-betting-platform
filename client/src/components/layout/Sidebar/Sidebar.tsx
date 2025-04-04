@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthContext } from '../../../contexts/AuthContext';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { getSports } from '../../../services/sport.service';
 import styles from './Sidebar.module.css';
 
@@ -24,6 +25,7 @@ export const Sidebar = () => {
   const [betslip, setBetslip] = useState<BetslipItem[]>([]);
   const [betAmount, setBetAmount] = useState<string>('');
   const { isAuthenticated } = useAuthContext();
+  const { t } = useLanguage();
   const location = useLocation();
 
   useEffect(() => {
@@ -102,9 +104,9 @@ export const Sidebar = () => {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.sidebarSection}>
-        <h2 className={styles.sidebarTitle}>Sports</h2>
+        <h2 className={styles.sidebarTitle}>{t('nav.sports')}</h2>
         {isLoading ? (
-          <p>Loading sports...</p>
+          <p>{t('home.loadingSports')}</p>
         ) : (
           <ul className={styles.sportsList}>
             {sports.map(sport => (
@@ -123,7 +125,7 @@ export const Sidebar = () => {
 
       <div className={`${styles.sidebarSection} ${styles.betslipSection}`}>
         <div className={styles.betslipTitle}>
-          <h2>Betslip</h2>
+          <h2>{t('betslip.title')}</h2>
           {betslip.length > 0 && (
             <span className={styles.betslipCount}>{betslip.length}</span>
           )}
@@ -131,8 +133,8 @@ export const Sidebar = () => {
 
         {betslip.length === 0 ? (
           <div className={styles.emptyBetslip}>
-            <p>Your betslip is empty</p>
-            <p>Select odds to add bets</p>
+            <p>{t('betslip.empty')}</p>
+            <p>{t('betslip.selectOdds')}</p>
           </div>
         ) : (
           <>
@@ -156,14 +158,14 @@ export const Sidebar = () => {
 
             <div className={styles.betslipFooter}>
               <div className={styles.betslipTotal}>
-                <span>Total Odds:</span>
+                <span>{t('betslip.totalOdds')}</span>
                 <span>{calculateTotalOdds().toFixed(2)}</span>
               </div>
 
               <div className={styles.betslipInput}>
                 <input
                   type="text"
-                  placeholder="Enter stake"
+                  placeholder={t('betslip.enterStake')}
                   value={betAmount}
                   onChange={handleBetAmountChange}
                 />
@@ -171,7 +173,7 @@ export const Sidebar = () => {
 
               {betAmount && (
                 <div className={styles.potentialWinnings}>
-                  Potential Winnings: ${calculatePotentialWinnings()}
+                  {t('betslip.potentialWinnings')} ${calculatePotentialWinnings()}
                 </div>
               )}
 
@@ -180,7 +182,7 @@ export const Sidebar = () => {
                 onClick={handlePlaceBet}
                 disabled={betslip.length === 0 || !betAmount}
               >
-                Place Bet
+                {t('betslip.placeBet')}
               </button>
             </div>
           </>

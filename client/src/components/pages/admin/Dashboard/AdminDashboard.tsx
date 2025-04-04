@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AdminLayout } from '../../../layout/AdminLayout/AdminLayout';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 import { getUsers } from '../../../../services/user.service';
 import { getEvents } from '../../../../services/event.service';
 import { getSports } from '../../../../services/sport.service';
@@ -16,6 +17,7 @@ export const AdminDashboard = () => {
   const [recentUsers, setRecentUsers] = useState<any[]>([]);
   const [recentEvents, setRecentEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,8 +69,8 @@ export const AdminDashboard = () => {
     return (
       <AdminLayout>
         <div className={styles.dashboard}>
-          <h1 className={styles.title}>Admin Dashboard</h1>
-          <p>Loading dashboard data...</p>
+          <h1 className={styles.title}>{t('admin.dashboard')}</h1>
+          <p>{t('admin.loadingDashboard')}</p>
         </div>
       </AdminLayout>
     );
@@ -77,29 +79,29 @@ export const AdminDashboard = () => {
   return (
     <AdminLayout>
       <div className={styles.dashboard}>
-        <h1 className={styles.title}>Admin Dashboard</h1>
+        <h1 className={styles.title}>{t('admin.dashboard')}</h1>
 
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>
-            <div className={styles.statTitle}>Total Users</div>
+            <div className={styles.statTitle}>{t('admin.totalUsers')}</div>
             <div className={styles.statValue}>{stats.users}</div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statTitle}>Total Sports</div>
+            <div className={styles.statTitle}>{t('admin.totalSports')}</div>
             <div className={styles.statValue}>{stats.sports}</div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statTitle}>Total Events</div>
+            <div className={styles.statTitle}>{t('admin.totalEvents')}</div>
             <div className={styles.statValue}>{stats.events}</div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statTitle}>Total Bets</div>
+            <div className={styles.statTitle}>{t('admin.totalBets')}</div>
             <div className={styles.statValue}>{stats.bets}</div>
           </div>
         </div>
 
         <div className={styles.recentSection}>
-          <h2 className={styles.sectionTitle}>Recent Users</h2>
+          <h2 className={styles.sectionTitle}>{t('admin.recentUsers')}</h2>
           <table className={styles.table}>
             <thead className={styles.tableHeader}>
               <tr>
@@ -123,12 +125,12 @@ export const AdminDashboard = () => {
             </tbody>
           </table>
           <Link to="/admin/users" className={styles.viewAllLink}>
-            View All Users
+            {t('admin.viewAllUsers')}
           </Link>
         </div>
 
         <div className={styles.recentSection}>
-          <h2 className={styles.sectionTitle}>Recent Events</h2>
+          <h2 className={styles.sectionTitle}>{t('admin.recentEvents')}</h2>
           <table className={styles.table}>
             <thead className={styles.tableHeader}>
               <tr>
@@ -154,7 +156,7 @@ export const AdminDashboard = () => {
             </tbody>
           </table>
           <Link to="/admin/events" className={styles.viewAllLink}>
-            View All Events
+            {t('admin.viewAllEvents')}
           </Link>
         </div>
       </div>

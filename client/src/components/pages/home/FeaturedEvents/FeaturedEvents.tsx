@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getEvents } from '../../../../services/event.service';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 import styles from './FeaturedEvents.module.css';
 
 interface Event {
@@ -22,6 +23,7 @@ interface Event {
 export const FeaturedEvents = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -91,16 +93,16 @@ export const FeaturedEvents = () => {
   };
 
   if (isLoading) {
-    return <div>Loading featured events...</div>;
+    return <div>{t('home.loadingFeaturedEvents')}</div>;
   }
 
   if (events.length === 0) {
-    return <div>No featured events available.</div>;
+    return <div>{t('home.noFeaturedEvents')}</div>;
   }
 
   return (
     <section className={styles.featuredEvents}>
-      <h2 className={styles.title}>Featured Events</h2>
+      <h2 className={styles.title}>{t('home.featuredEvents')}</h2>
       <div className={styles.eventsGrid}>
         {events.map(event => (
           <div key={event.id} className={styles.eventCard}>

@@ -1,35 +1,37 @@
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../../../contexts/AuthContext';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 import { Button } from '../../../common/Button/Button';
 import styles from './Hero.module.css';
 
 export const Hero = () => {
   const { isAuthenticated } = useAuthContext();
+  const { t } = useLanguage();
 
   return (
     <section className={styles.hero}>
       <div className={styles.heroContent}>
-        <h1 className={styles.heroTitle}>Welcome to BetMaster</h1>
+        <h1 className={styles.heroTitle}>{t('home.welcome')}</h1>
         <p className={styles.heroSubtitle}>
-          The ultimate sports betting platform. Place bets on your favorite sports and events.
+          {t('home.subtitle')}
         </p>
         <div className={styles.heroCta}>
           {isAuthenticated ? (
             <>
               <Button to="/sports" size="large">
-                Browse Sports
+                {t('home.browseSports')}
               </Button>
               <Button to="/live" variant="outline" size="large">
-                Live Events
+                {t('home.liveEvents')}
               </Button>
             </>
           ) : (
             <>
               <Button to="/register" size="large">
-                Sign Up Now
+                {t('home.signUpNow')}
               </Button>
               <Button to="/login" variant="outline" size="large">
-                Login
+                {t('auth.login')}
               </Button>
             </>
           )}

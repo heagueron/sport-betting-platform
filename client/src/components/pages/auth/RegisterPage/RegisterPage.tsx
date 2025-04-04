@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../../../contexts/AuthContext';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 import { MainLayout } from '../../../layout/MainLayout/MainLayout';
 import { Input } from '../../../common/Input/Input';
 import { Button } from '../../../common/Button/Button';
@@ -18,6 +19,7 @@ export const RegisterPage = () => {
     confirmPassword?: string;
   }>({});
   const { register, error: registerError } = useAuthContext();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -30,31 +32,31 @@ export const RegisterPage = () => {
     let isValid = true;
 
     if (!name) {
-      newErrors.name = 'Name is required';
+      newErrors.name = t('auth.nameRequired');
       isValid = false;
     }
 
     if (!email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('auth.emailRequired');
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = t('auth.emailInvalid');
       isValid = false;
     }
 
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('auth.passwordRequired');
       isValid = false;
     } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = t('auth.passwordMinLength');
       isValid = false;
     }
 
     if (!confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
+      newErrors.confirmPassword = t('auth.confirmPasswordRequired');
       isValid = false;
     } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = t('auth.passwordsDoNotMatch');
       isValid = false;
     }
 
@@ -80,7 +82,7 @@ export const RegisterPage = () => {
       <div className={styles.registerPage}>
         <div className={styles.registerCard}>
           <div className={styles.registerHeader}>
-            <h1 className={styles.registerTitle}>Create an Account</h1>
+            <h1 className={styles.registerTitle}>{t('auth.createAccount')}</h1>
           </div>
           <div className={styles.registerBody}>
             {registerError && (
@@ -91,48 +93,48 @@ export const RegisterPage = () => {
             <form className={styles.registerForm} onSubmit={handleSubmit}>
               <Input
                 type="text"
-                label="Name"
-                placeholder="Enter your name"
+                label={t('auth.name')}
+                placeholder={t('auth.name')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 error={errors.name}
               />
               <Input
                 type="email"
-                label="Email"
-                placeholder="Enter your email"
+                label={t('auth.email')}
+                placeholder={t('auth.email')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 error={errors.email}
               />
               <Input
                 type="password"
-                label="Password"
-                placeholder="Enter your password"
+                label={t('auth.password')}
+                placeholder={t('auth.password')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 error={errors.password}
-                helperText="Password must be at least 6 characters"
+                helperText={t('auth.passwordMinLength')}
               />
               <Input
                 type="password"
-                label="Confirm Password"
-                placeholder="Confirm your password"
+                label={t('auth.confirmPassword')}
+                placeholder={t('auth.confirmPassword')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 error={errors.confirmPassword}
               />
               <Button type="submit" fullWidth>
-                Register
+                {t('auth.register')}
               </Button>
               <div className={styles.termsText}>
-                By registering, you agree to our{' '}
-                <Link to="/terms">Terms of Service</Link> and{' '}
-                <Link to="/privacy">Privacy Policy</Link>.
+                {t('auth.termsAgreement')}{' '}
+                <Link to="/terms">{t('auth.termsOfService')}</Link> {t('auth.and')}{' '}
+                <Link to="/privacy">{t('auth.privacyPolicy')}</Link>.
               </div>
               <div className={styles.formFooter}>
                 <span className={styles.loginLink}>
-                  Already have an account? <Link to="/login">Login</Link>
+                  {t('auth.alreadyHaveAccount')} <Link to="/login">{t('auth.login')}</Link>
                 </span>
               </div>
             </form>

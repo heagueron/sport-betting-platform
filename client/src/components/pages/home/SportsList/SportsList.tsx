@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getSports } from '../../../../services/sport.service';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 import { Sport } from '../../../../types';
 import styles from './SportsList.module.css';
 
@@ -22,6 +23,7 @@ const sportIcons: Record<string, string> = {
 export const SportsList = () => {
   const [sports, setSports] = useState<Sport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchSports = async () => {
@@ -43,32 +45,32 @@ export const SportsList = () => {
 
   const getSportIcon = (sportName: string) => {
     const lowerCaseName = sportName.toLowerCase();
-    
+
     for (const [key, icon] of Object.entries(sportIcons)) {
       if (lowerCaseName.includes(key)) {
         return icon;
       }
     }
-    
+
     return sportIcons.default;
   };
 
   if (isLoading) {
-    return <div>Loading sports...</div>;
+    return <div>{t('home.loadingSports')}</div>;
   }
 
   if (sports.length === 0) {
-    return <div>No sports available.</div>;
+    return <div>{t('home.noSportsAvailable')}</div>;
   }
 
   return (
     <section className={styles.sportsList}>
-      <h2 className={styles.title}>Browse Sports</h2>
+      <h2 className={styles.title}>{t('home.browseSportsTitle')}</h2>
       <div className={styles.sportsGrid}>
         {sports.map(sport => (
-          <Link 
-            key={sport.id} 
-            to={`/sports/${sport.slug}`} 
+          <Link
+            key={sport.id}
+            to={`/sports/${sport.slug}`}
             className={styles.sportCard}
           >
             <div className={styles.sportIcon}>

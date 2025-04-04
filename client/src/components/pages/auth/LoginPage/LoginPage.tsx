@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../../../contexts/AuthContext';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 import { MainLayout } from '../../../layout/MainLayout/MainLayout';
 import { Input } from '../../../common/Input/Input';
 import { Button } from '../../../common/Button/Button';
@@ -11,6 +12,7 @@ export const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const { login, error: loginError } = useAuthContext();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -18,15 +20,15 @@ export const LoginPage = () => {
     let isValid = true;
 
     if (!email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('auth.emailRequired');
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = t('auth.emailInvalid');
       isValid = false;
     }
 
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('auth.passwordRequired');
       isValid = false;
     }
 
@@ -52,7 +54,7 @@ export const LoginPage = () => {
       <div className={styles.loginPage}>
         <div className={styles.loginCard}>
           <div className={styles.loginHeader}>
-            <h1 className={styles.loginTitle}>Login to BetMaster</h1>
+            <h1 className={styles.loginTitle}>{t('auth.loginToAccount')}</h1>
           </div>
           <div className={styles.loginBody}>
             {loginError && (
@@ -63,27 +65,27 @@ export const LoginPage = () => {
             <form className={styles.loginForm} onSubmit={handleSubmit}>
               <Input
                 type="email"
-                label="Email"
-                placeholder="Enter your email"
+                label={t('auth.email')}
+                placeholder={t('auth.email')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 error={errors.email}
               />
               <Input
                 type="password"
-                label="Password"
-                placeholder="Enter your password"
+                label={t('auth.password')}
+                placeholder={t('auth.password')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 error={errors.password}
               />
               <Button type="submit" fullWidth>
-                Login
+                {t('auth.login')}
               </Button>
               <div className={styles.formFooter}>
-                <Link to="/forgot-password">Forgot password?</Link>
+                <Link to="/forgot-password">{t('auth.forgotPassword')}</Link>
                 <span className={styles.registerLink}>
-                  Don't have an account? <Link to="/register">Register</Link>
+                  {t('auth.dontHaveAccount')} <Link to="/register">{t('auth.register')}</Link>
                 </span>
               </div>
             </form>

@@ -3,6 +3,7 @@ import { AdminLayout } from '../../../layout/AdminLayout/AdminLayout';
 import { Button } from '../../../common/Button/Button';
 import { Input } from '../../../common/Input/Input';
 import { getSports, createSport, updateSport, deleteSport } from '../../../../services/sport.service';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 import styles from './AdminSports.module.css';
 
 interface Sport {
@@ -24,6 +25,7 @@ export const AdminSports = () => {
     name: '',
     active: true,
   });
+  const { t } = useLanguage();
 
   useEffect(() => {
     fetchSports();
@@ -100,7 +102,7 @@ export const AdminSports = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this sport?')) {
+    if (window.confirm(t('admin.confirmDelete'))) {
       try {
         const response = await deleteSport(id);
         if (response.success) {
@@ -125,21 +127,21 @@ export const AdminSports = () => {
     <AdminLayout>
       <div className={styles.sportsPage}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Sports Management</h1>
-          <Button onClick={openCreateModal}>Add New Sport</Button>
+          <h1 className={styles.title}>{t('admin.sportsManagement')}</h1>
+          <Button onClick={openCreateModal}>{t('admin.addNewSport')}</Button>
         </div>
 
         {isLoading ? (
-          <p>Loading sports...</p>
+          <p>{t('admin.loadingSports')}</p>
         ) : (
           <table className={styles.table}>
             <thead className={styles.tableHeader}>
               <tr>
-                <th>Name</th>
-                <th>Slug</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>Actions</th>
+                <th>{t('auth.name')}</th>
+                <th>{t('admin.slug')}</th>
+                <th>{t('admin.status')}</th>
+                <th>{t('admin.created')}</th>
+                <th>{t('admin.actions')}</th>
               </tr>
             </thead>
             <tbody className={styles.tableBody}>
@@ -183,7 +185,7 @@ export const AdminSports = () => {
             <div className={styles.modalContent}>
               <div className={styles.modalHeader}>
                 <h2 className={styles.modalTitle}>
-                  {modalMode === 'create' ? 'Add New Sport' : 'Edit Sport'}
+                  {modalMode === 'create' ? t('admin.addNewSport') : t('admin.editSport')}
                 </h2>
                 <button className={styles.closeButton} onClick={closeModal}>
                   ×
@@ -192,7 +194,7 @@ export const AdminSports = () => {
               <form onSubmit={handleSubmit}>
                 <div className={styles.modalBody}>
                   <Input
-                    label="Sport Name"
+                    label={t('admin.sportName')}
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
@@ -207,16 +209,16 @@ export const AdminSports = () => {
                         checked={formData.active}
                         onChange={handleInputChange}
                       />
-                      <label htmlFor="active">Active</label>
+                      <label htmlFor="active">{t('admin.active')}</label>
                     </div>
                   </div>
                 </div>
                 <div className={styles.modalFooter}>
                   <Button variant="outline" onClick={closeModal}>
-                    Cancel
+                    {t('admin.cancel')}
                   </Button>
                   <Button type="submit">
-                    {modalMode === 'create' ? 'Create' : 'Save'}
+                    {modalMode === 'create' ? t('admin.create') : t('admin.save')}
                   </Button>
                 </div>
               </form>

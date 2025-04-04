@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { HomePage } from './components/pages/home/HomePage';
 import { LoginPage } from './components/pages/auth/LoginPage/LoginPage';
@@ -10,7 +11,8 @@ import './styles/global.css';
 
 function App() {
   return (
-    <AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
       <Router>
         <Routes>
           {/* Public routes */}
@@ -38,6 +40,7 @@ function App() {
         </Routes>
       </Router>
     </AuthProvider>
+    </LanguageProvider>
   );
 }
 
