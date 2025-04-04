@@ -9,7 +9,13 @@
     "build": "tsc",
     "test": "jest --detectOpenHandles --no-cache --testTimeout=10000",
     "test:watch": "jest --watch --detectOpenHandles --no-cache",
-    "test:coverage": "jest --coverage --detectOpenHandles --no-cache"
+    "test:coverage": "jest --coverage --detectOpenHandles --no-cache",
+    "seed": "ts-node prisma/seed.ts",
+    "seed:bets": "ts-node prisma/seedBets.ts",
+    "db:seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
