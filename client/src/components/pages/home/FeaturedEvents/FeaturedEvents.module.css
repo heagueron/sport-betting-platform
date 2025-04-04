@@ -1,0 +1,133 @@
+.featuredEvents {
+  margin-bottom: var(--spacing-xl);
+}
+
+.title {
+  margin-bottom: var(--spacing-md);
+  color: var(--primary-dark);
+}
+
+.eventsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.eventCard {
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.eventCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.eventHeader {
+  background-color: var(--primary-main);
+  color: var(--neutral-100);
+  padding: var(--spacing-sm) var(--spacing-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.eventTitle {
+  font-weight: 600;
+  margin: 0;
+}
+
+.eventStatus {
+  font-size: var(--font-size-xs);
+  padding: 2px var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.scheduled {
+  background-color: var(--info);
+}
+
+.live {
+  background-color: var(--error);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.eventBody {
+  padding: var(--spacing-md);
+  background-color: var(--neutral-100);
+}
+
+.eventInfo {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--neutral-600);
+}
+
+.eventTime, .eventSport {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.participants {
+  margin-top: var(--spacing-md);
+}
+
+.participant {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  margin-bottom: var(--spacing-xs);
+  background-color: var(--neutral-200);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.participant:hover {
+  background-color: var(--neutral-300);
+}
+
+.participantName {
+  font-weight: 500;
+}
+
+.oddsButton {
+  background-color: var(--secondary-main);
+  color: var(--neutral-900);
+  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.oddsButton:hover {
+  background-color: var(--secondary-dark);
+  color: var(--neutral-100);
+}
+
+@media (max-width: 768px) {
+  .eventsGrid {
+    grid-template-columns: 1fr;
+  }
+}

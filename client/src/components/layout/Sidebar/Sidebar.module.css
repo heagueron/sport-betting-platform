@@ -1,0 +1,187 @@
+.sidebar {
+  background-color: var(--neutral-100);
+  width: var(--sidebar-width);
+  padding: var(--spacing-md);
+  border-right: 1px solid var(--neutral-300);
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebarSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.sidebarTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--primary-dark);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 2px solid var(--primary-light);
+}
+
+.sportsList {
+  list-style: none;
+  padding: 0;
+}
+
+.sportItem {
+  margin-bottom: var(--spacing-xs);
+}
+
+.sportLink {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  color: var(--neutral-800);
+  text-decoration: none;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.sportLink:hover {
+  background-color: var(--neutral-200);
+  text-decoration: none;
+}
+
+.activeSportLink {
+  background-color: var(--primary-light);
+  color: var(--neutral-100);
+}
+
+.activeSportLink:hover {
+  background-color: var(--primary-main);
+}
+
+.sportIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.betslipSection {
+  background-color: var(--neutral-200);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+}
+
+.betslipTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.betslipCount {
+  background-color: var(--primary-main);
+  color: var(--neutral-100);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: 2px var(--spacing-xs);
+  border-radius: var(--border-radius-full);
+}
+
+.emptyBetslip {
+  text-align: center;
+  color: var(--neutral-600);
+  font-style: italic;
+  padding: var(--spacing-md) 0;
+}
+
+.betItem {
+  background-color: var(--neutral-100);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  position: relative;
+}
+
+.betItemHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+}
+
+.betItemEvent {
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  color: var(--error);
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  padding: 0;
+}
+
+.betItemSelection {
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.betItemOdds {
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.betslipFooter {
+  margin-top: var(--spacing-md);
+}
+
+.betslipTotal {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.betslipInput {
+  display: flex;
+  margin-bottom: var(--spacing-sm);
+}
+
+.betslipInput input {
+  flex: 1;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--neutral-400);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+}
+
+.potentialWinnings {
+  font-size: var(--font-size-sm);
+  color: var(--success);
+  text-align: right;
+  margin-bottom: var(--spacing-md);
+}
+
+.placeBetButton {
+  width: 100%;
+  background-color: var(--secondary-main);
+  color: var(--neutral-900);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
+  font-weight: 600;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.placeBetButton:hover {
+  background-color: var(--secondary-dark);
+  color: var(--neutral-100);
+}
+
+.placeBetButton:disabled {
+  background-color: var(--neutral-400);
+  cursor: not-allowed;
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--neutral-300);
+  }
+}

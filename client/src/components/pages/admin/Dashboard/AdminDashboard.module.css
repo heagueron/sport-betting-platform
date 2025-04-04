@@ -1,0 +1,132 @@
+.dashboard {
+  padding: var(--spacing-md);
+}
+
+.title {
+  margin-bottom: var(--spacing-lg);
+  color: var(--primary-dark);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.statCard {
+  background-color: var(--neutral-100);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.statTitle {
+  font-size: var(--font-size-md);
+  color: var(--neutral-600);
+  margin-bottom: var(--spacing-sm);
+}
+
+.statValue {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.recentSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-md);
+  color: var(--primary-dark);
+  border-bottom: 2px solid var(--primary-light);
+  padding-bottom: var(--spacing-xs);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--neutral-100);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.tableHeader {
+  background-color: var(--primary-main);
+  color: var(--neutral-100);
+  text-align: left;
+}
+
+.tableHeader th {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-weight: 600;
+}
+
+.tableBody tr {
+  border-bottom: 1px solid var(--neutral-300);
+}
+
+.tableBody tr:last-child {
+  border-bottom: none;
+}
+
+.tableBody td {
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.tableBody tr:nth-child(even) {
+  background-color: var(--neutral-200);
+}
+
+.status {
+  display: inline-block;
+  padding: 2px var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.pending {
+  background-color: var(--warning);
+  color: var(--neutral-900);
+}
+
+.won {
+  background-color: var(--success);
+  color: var(--neutral-100);
+}
+
+.lost {
+  background-color: var(--error);
+  color: var(--neutral-100);
+}
+
+.viewAllLink {
+  display: block;
+  text-align: right;
+  margin-top: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--primary-main);
+}
+
+@media (max-width: 768px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}

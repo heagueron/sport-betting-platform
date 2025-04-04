@@ -1,0 +1,55 @@
+.loginPage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - var(--header-height) - var(--footer-height));
+  padding: var(--spacing-xl) var(--spacing-md);
+  background-color: var(--neutral-200);
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 400px;
+  background-color: var(--neutral-100);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.loginHeader {
+  background-color: var(--primary-dark);
+  color: var(--neutral-100);
+  padding: var(--spacing-lg);
+  text-align: center;
+}
+
+.loginTitle {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  color: var(--neutral-100);
+}
+
+.loginBody {
+  padding: var(--spacing-lg);
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.formGroup {
+  margin-bottom: var(--spacing-md);
+}
+
+.formFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--spacing-lg);
+}
+
+.registerLink {
+  font-size: var(--font-size-sm);
+}
