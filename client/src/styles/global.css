@@ -12,8 +12,11 @@ html, body {
   font-family: var(--font-family-main);
   font-size: var(--font-size-md);
   line-height: 1.5;
-  color: var(--neutral-900);
-  background-color: var(--neutral-200);
+  color: var(--neutral-100);
+  background-color: var(--primary-dark);
+  background-image: linear-gradient(135deg, var(--primary-dark) 0%, #0a0f20 100%);
+  background-attachment: fixed;
+  overflow-x: hidden;
 }
 
 #root {

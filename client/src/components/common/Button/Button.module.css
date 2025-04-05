@@ -20,33 +20,103 @@
 
 /* Button variants */
 .primary {
-  background-color: var(--primary-main);
+  background: linear-gradient(135deg, var(--primary-main), var(--primary-dark));
   color: var(--neutral-100);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.primary::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  z-index: -1;
+}
+
+.primary:hover::before {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .primary:hover:not(:disabled) {
-  background-color: var(--primary-dark);
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-main));
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 5px rgba(59, 130, 246, 0.5);
+  transform: translateY(-2px);
 }
 
 .secondary {
-  background-color: var(--secondary-main);
-  color: var(--neutral-900);
+  background: linear-gradient(135deg, var(--secondary-main), var(--secondary-dark));
+  color: var(--neutral-100);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.secondary::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  z-index: -1;
+}
+
+.secondary:hover::before {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .secondary:hover:not(:disabled) {
-  background-color: var(--secondary-dark);
+  background: linear-gradient(135deg, var(--secondary-dark), var(--accent-3));
   color: var(--neutral-100);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 5px rgba(236, 72, 153, 0.5);
+  transform: translateY(-2px);
 }
 
 .outline {
   background-color: transparent;
-  border: 1px solid var(--primary-main);
-  color: var(--primary-main);
+  border: 1px solid var(--accent-1);
+  color: var(--accent-1);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.outline::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--accent-1), var(--primary-light));
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease-in-out;
 }
 
 .outline:hover:not(:disabled) {
-  background-color: var(--primary-main);
+  border-color: var(--accent-1);
   color: var(--neutral-100);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 5px rgba(6, 182, 212, 0.5);
+  transform: translateY(-2px);
+}
+
+.outline:hover:not(:disabled)::after {
+  opacity: 1;
 }
 
 .text {

@@ -2,4 +2,12 @@
   max-width: var(--max-content-width);
   margin: 0 auto;
   padding: var(--spacing-md);
+  position: relative;
+  z-index: 1;
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

@@ -1,10 +1,31 @@
 .sportsList {
   margin-bottom: var(--spacing-xl);
+  position: relative;
+  z-index: 1;
+  padding: var(--spacing-lg);
+  background-color: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .title {
   margin-bottom: var(--spacing-md);
-  color: var(--primary-dark);
+  color: var(--neutral-100);
+  position: relative;
+  display: inline-block;
+  padding-bottom: var(--spacing-sm);
+}
+
+.title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--secondary-main), transparent);
+  border-radius: var(--border-radius-full);
 }
 
 .sportsGrid {
@@ -14,35 +35,86 @@
 }
 
 .sportCard {
-  background-color: var(--neutral-100);
+  background: rgba(30, 41, 59, 0.7);
   border-radius: var(--border-radius-md);
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
   text-decoration: none;
-  color: var(--neutral-900);
+  color: var(--neutral-100);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  animation: fadeInUp 0.5s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.sportCard:nth-child(2n) {
+  animation-delay: 0.1s;
+}
+
+.sportCard:nth-child(3n) {
+  animation-delay: 0.2s;
+}
+
+.sportCard:nth-child(4n) {
+  animation-delay: 0.3s;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .sportCard:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 10px rgba(59, 130, 246, 0.3);
   text-decoration: none;
+  border-color: var(--accent-1);
 }
 
 .sportIcon {
-  background-color: var(--primary-light);
+  background: linear-gradient(135deg, var(--primary-main), var(--primary-dark));
   height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
+  font-size: 3.5rem;
   color: var(--neutral-100);
+  position: relative;
+  overflow: hidden;
+}
+
+.sportIcon::before {
+  content: '';
+  position: absolute;
+  width: 150%;
+  height: 150%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  top: -25%;
+  left: -25%;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.sportCard:hover .sportIcon::before {
+  opacity: 1;
 }
 
 .sportName {
   padding: var(--spacing-md);
   font-weight: 600;
   text-align: center;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.sportCard:hover .sportName {
+  color: var(--secondary-light);
+  transform: scale(1.05);
 }
 
 @media (max-width: 768px) {

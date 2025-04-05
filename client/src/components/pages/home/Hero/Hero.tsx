@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../../../contexts/AuthContext';
 import { useLanguage } from '../../../../contexts/LanguageContext';
 import { Button } from '../../../common/Button/Button';
+import { AnimatedBackground } from '../../../common/AnimatedBackground/AnimatedBackground';
 import styles from './Hero.module.css';
 
 export const Hero = () => {
@@ -10,6 +11,7 @@ export const Hero = () => {
 
   return (
     <section className={styles.hero}>
+      <AnimatedBackground />
       <div className={styles.heroContent}>
         <h1 className={styles.heroTitle}>{t('home.welcome')}</h1>
         <p className={styles.heroSubtitle}>
@@ -37,7 +39,10 @@ export const Hero = () => {
           )}
         </div>
       </div>
-      <div className={styles.heroBackground}></div>
+      <div className={styles.heroImageContainer}>
+        {/* Usamos un div con gradiente en lugar de una imagen */}
+        <div className={styles.heroImageGradient}></div>
+      </div>
     </section>
   );
 };

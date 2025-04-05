@@ -7,11 +7,15 @@
 .main {
   display: flex;
   flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .content {
   flex: 1;
   padding: var(--spacing-md);
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 1024px) {
