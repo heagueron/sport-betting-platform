@@ -43,16 +43,29 @@ export const SportsList = () => {
     fetchSports();
   }, []);
 
-  const getSportIcon = (sportName: string) => {
+  const getSportImage = (sportName: string) => {
     const lowerCaseName = sportName.toLowerCase();
 
-    for (const [key, icon] of Object.entries(sportIcons)) {
-      if (lowerCaseName.includes(key)) {
-        return icon;
-      }
+    if (lowerCaseName.includes('football') || lowerCaseName.includes('soccer')) {
+      return 'images/football10.png';
+    } else if (lowerCaseName.includes('basketball')) {
+      return 'images/basketball1.png';
+    } else if (lowerCaseName.includes('tennis')) {
+      return 'images/tennis5.png';
+    } else if (lowerCaseName.includes('baseball')) {
+      return 'images/baseball1.png';
+    } else if (lowerCaseName.includes('boxing')) {
+      return 'images/boxing1.png';
+    } else if (lowerCaseName.includes('athletics')) {
+      return 'images/Athletics1.png';
+    } else if (lowerCaseName.includes('padel')) {
+      return 'images/padel1.png';
+    } else if (lowerCaseName.includes('horse')) {
+      return 'images/horse_racing.png';
     }
 
-    return sportIcons.default;
+    // Default image
+    return 'images/watching_sports_at_home.png';
   };
 
   if (isLoading) {
@@ -74,7 +87,11 @@ export const SportsList = () => {
             className={styles.sportCard}
           >
             <div className={styles.sportIcon}>
-              {getSportIcon(sport.name)}
+              <img
+                src={getSportImage(sport.name)}
+                alt={sport.name}
+                className={styles.sportImage}
+              />
             </div>
             <div className={styles.sportName}>
               {sport.name}

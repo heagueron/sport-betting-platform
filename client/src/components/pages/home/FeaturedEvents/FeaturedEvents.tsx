@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getEvents } from '../../../../services/event.service';
 import { useLanguage } from '../../../../contexts/LanguageContext';
+import { ImageCollage } from '../../../common/ImageCollage/ImageCollage';
 import styles from './FeaturedEvents.module.css';
 
 interface Event {
@@ -24,6 +25,33 @@ export const FeaturedEvents = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useLanguage();
+
+  const collageItems = [
+    {
+      image: 'images/football10.png',
+      title: t('home.featuredEvents.football'),
+      description: t('home.featuredEvents.footballDesc'),
+      link: '/sports/football'
+    },
+    {
+      image: 'images/basketball2.png',
+      title: t('home.featuredEvents.basketball'),
+      description: t('home.featuredEvents.basketballDesc'),
+      link: '/sports/basketball'
+    },
+    {
+      image: 'images/tennis6.png',
+      title: t('home.featuredEvents.tennis'),
+      description: t('home.featuredEvents.tennisDesc'),
+      link: '/sports/tennis'
+    },
+    {
+      image: 'images/baseball2.png',
+      title: t('home.featuredEvents.baseball'),
+      description: t('home.featuredEvents.baseballDesc'),
+      link: '/sports/baseball'
+    }
+  ];
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -103,6 +131,9 @@ export const FeaturedEvents = () => {
   return (
     <section className={styles.featuredEvents}>
       <h2 className={styles.title}>{t('home.featuredEvents')}</h2>
+
+      <ImageCollage items={collageItems} />
+
       <div className={styles.eventsGrid}>
         {events.map(event => (
           <div key={event.id} className={styles.eventCard}>

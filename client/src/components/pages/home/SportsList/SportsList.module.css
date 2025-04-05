@@ -76,27 +76,31 @@
 }
 
 .sportIcon {
-  background: linear-gradient(135deg, var(--primary-main), var(--primary-dark));
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3.5rem;
-  color: var(--neutral-100);
+  height: 180px;
   position: relative;
   overflow: hidden;
+}
+
+.sportImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.sportCard:hover .sportImage {
+  transform: scale(1.1);
 }
 
 .sportIcon::before {
   content: '';
   position: absolute;
-  width: 150%;
-  height: 150%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-  top: -25%;
-  left: -25%;
-  opacity: 0;
-  transition: opacity 0.5s ease-in-out;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.6) 100%);
+  z-index: 1;
 }
 
 .sportCard:hover .sportIcon::before {
@@ -107,9 +111,14 @@
   padding: var(--spacing-md);
   font-weight: 600;
   text-align: center;
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
   transition: all 0.3s ease;
+  color: var(--neutral-100);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .sportCard:hover .sportName {

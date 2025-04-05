@@ -2,14 +2,14 @@ export const en = {
   // Common
   "app.name": "BetMaster",
   "app.tagline": "The ultimate sports betting platform",
-  
+
   // Navigation
   "nav.home": "Home",
   "nav.sports": "Sports",
   "nav.live": "Live Events",
   "nav.mybets": "My Bets",
   "nav.admin": "Admin",
-  
+
   // Auth
   "auth.login": "Login",
   "auth.register": "Register",
@@ -34,7 +34,7 @@ export const en = {
   "auth.passwordsDoNotMatch": "Passwords do not match",
   "auth.nameRequired": "Name is required",
   "auth.confirmPasswordRequired": "Please confirm your password",
-  
+
   // Home Page
   "home.welcome": "Welcome to BetMaster",
   "home.subtitle": "The ultimate sports betting platform. Place bets on your favorite sports and events.",
@@ -47,7 +47,28 @@ export const en = {
   "home.loadingFeaturedEvents": "Loading featured events...",
   "home.loadingSports": "Loading sports...",
   "home.noSportsAvailable": "No sports available.",
-  
+
+  // Carousel
+  "home.carousel.football.title": "Football",
+  "home.carousel.football.description": "Enjoy the best football matches and place your bets in real time.",
+  "home.carousel.basketball.title": "Basketball",
+  "home.carousel.basketball.description": "Experience the excitement of basketball and bet on your favorite teams.",
+  "home.carousel.tennis.title": "Tennis",
+  "home.carousel.tennis.description": "Follow the most important tennis tournaments and bet on every match.",
+  "home.carousel.baseball.title": "Baseball",
+  "home.carousel.baseball.description": "Don't miss any baseball game and place your bets with the best odds.",
+  "home.carousel.viewEvents": "View Events",
+
+  // Featured Events
+  "home.featuredEvents.football": "Football",
+  "home.featuredEvents.footballDesc": "The best football matches with the best odds.",
+  "home.featuredEvents.basketball": "Basketball",
+  "home.featuredEvents.basketballDesc": "Enjoy the best basketball and bet live.",
+  "home.featuredEvents.tennis": "Tennis",
+  "home.featuredEvents.tennisDesc": "Great tennis tournaments with exciting bets.",
+  "home.featuredEvents.baseball": "Baseball",
+  "home.featuredEvents.baseballDesc": "Bet on the best baseball games in the world.",
+
   // Betslip
   "betslip.title": "Betslip",
   "betslip.empty": "Your betslip is empty",
@@ -56,13 +77,13 @@ export const en = {
   "betslip.enterStake": "Enter stake",
   "betslip.potentialWinnings": "Potential Winnings:",
   "betslip.placeBet": "Place Bet",
-  
+
   // Event Status
   "event.status.scheduled": "SCHEDULED",
   "event.status.live": "LIVE",
   "event.status.completed": "COMPLETED",
   "event.status.cancelled": "CANCELLED",
-  
+
   // Admin Dashboard
   "admin.dashboard": "Admin Dashboard",
   "admin.users": "Users",
@@ -78,7 +99,7 @@ export const en = {
   "admin.viewAllUsers": "View All Users",
   "admin.viewAllEvents": "View All Events",
   "admin.loadingDashboard": "Loading dashboard data...",
-  
+
   // Sports Management
   "admin.sportsManagement": "Sports Management",
   "admin.addNewSport": "Add New Sport",
@@ -94,7 +115,7 @@ export const en = {
   "admin.create": "Create",
   "admin.save": "Save",
   "admin.slug": "Slug",
-  
+
   // Footer
   "footer.aboutUs": "About Us",
   "footer.aboutBetMaster": "About BetMaster",
@@ -114,11 +135,11 @@ export const en = {
   "footer.paymentMethods": "Payment Methods",
   "footer.followUs": "Follow Us",
   "footer.allRightsReserved": "All rights reserved.",
-  
+
   // User Profile
   "profile.title": "My Profile",
   "profile.balance": "Balance:",
-  
+
   // Sport Names
   "sport.football": "Football",
   "sport.soccer": "Soccer",
@@ -130,7 +151,7 @@ export const en = {
   "sport.boxing": "Boxing",
   "sport.mma": "MMA",
   "sport.cricket": "Cricket",
-  
+
   // Misc
   "loading": "Loading...",
   "error": "Error",

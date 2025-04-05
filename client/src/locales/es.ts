@@ -2,14 +2,14 @@ export const es = {
   // Common
   "app.name": "BetMaster",
   "app.tagline": "La mejor plataforma de apuestas deportivas",
-  
+
   // Navigation
   "nav.home": "Inicio",
   "nav.sports": "Deportes",
   "nav.live": "En Vivo",
   "nav.mybets": "Mis Apuestas",
   "nav.admin": "Administración",
-  
+
   // Auth
   "auth.login": "Iniciar Sesión",
   "auth.register": "Registrarse",
@@ -34,7 +34,7 @@ export const es = {
   "auth.passwordsDoNotMatch": "Las contraseñas no coinciden",
   "auth.nameRequired": "El nombre es obligatorio",
   "auth.confirmPasswordRequired": "Por favor confirma tu contraseña",
-  
+
   // Home Page
   "home.welcome": "Bienvenido a BetMaster",
   "home.subtitle": "La plataforma definitiva de apuestas deportivas. Haz apuestas en tus deportes y eventos favoritos.",
@@ -47,7 +47,28 @@ export const es = {
   "home.loadingFeaturedEvents": "Cargando eventos destacados...",
   "home.loadingSports": "Cargando deportes...",
   "home.noSportsAvailable": "No hay deportes disponibles.",
-  
+
+  // Carousel
+  "home.carousel.football.title": "Fútbol",
+  "home.carousel.football.description": "Disfruta de los mejores partidos de fútbol y haz tus apuestas en tiempo real.",
+  "home.carousel.basketball.title": "Baloncesto",
+  "home.carousel.basketball.description": "Vive la emoción del baloncesto y apuesta por tus equipos favoritos.",
+  "home.carousel.tennis.title": "Tenis",
+  "home.carousel.tennis.description": "Sigue los torneos más importantes de tenis y apuesta en cada partido.",
+  "home.carousel.baseball.title": "Béisbol",
+  "home.carousel.baseball.description": "No te pierdas ningún juego de béisbol y haz tus apuestas con las mejores cuotas.",
+  "home.carousel.viewEvents": "Ver Eventos",
+
+  // Featured Events
+  "home.featuredEvents.football": "Fútbol",
+  "home.featuredEvents.footballDesc": "Los mejores partidos de fútbol con las mejores cuotas.",
+  "home.featuredEvents.basketball": "Baloncesto",
+  "home.featuredEvents.basketballDesc": "Disfruta del mejor baloncesto y apuesta en vivo.",
+  "home.featuredEvents.tennis": "Tenis",
+  "home.featuredEvents.tennisDesc": "Grandes torneos de tenis con apuestas emocionantes.",
+  "home.featuredEvents.baseball": "Béisbol",
+  "home.featuredEvents.baseballDesc": "Apuesta en los mejores juegos de béisbol del mundo.",
+
   // Betslip
   "betslip.title": "Boleto de Apuestas",
   "betslip.empty": "Tu boleto de apuestas está vacío",
@@ -56,13 +77,13 @@ export const es = {
   "betslip.enterStake": "Ingresa tu apuesta",
   "betslip.potentialWinnings": "Ganancias Potenciales:",
   "betslip.placeBet": "Realizar Apuesta",
-  
+
   // Event Status
   "event.status.scheduled": "PROGRAMADO",
   "event.status.live": "EN VIVO",
   "event.status.completed": "COMPLETADO",
   "event.status.cancelled": "CANCELADO",
-  
+
   // Admin Dashboard
   "admin.dashboard": "Panel de Administración",
   "admin.users": "Usuarios",
@@ -78,7 +99,7 @@ export const es = {
   "admin.viewAllUsers": "Ver Todos los Usuarios",
   "admin.viewAllEvents": "Ver Todos los Eventos",
   "admin.loadingDashboard": "Cargando datos del panel...",
-  
+
   // Sports Management
   "admin.sportsManagement": "Gestión de Deportes",
   "admin.addNewSport": "Añadir Nuevo Deporte",
@@ -94,7 +115,7 @@ export const es = {
   "admin.create": "Crear",
   "admin.save": "Guardar",
   "admin.slug": "Slug",
-  
+
   // Footer
   "footer.aboutUs": "Sobre Nosotros",
   "footer.aboutBetMaster": "Sobre BetMaster",
@@ -114,11 +135,11 @@ export const es = {
   "footer.paymentMethods": "Métodos de Pago",
   "footer.followUs": "Síguenos",
   "footer.allRightsReserved": "Todos los derechos reservados.",
-  
+
   // User Profile
   "profile.title": "Mi Perfil",
   "profile.balance": "Saldo:",
-  
+
   // Sport Names
   "sport.football": "Fútbol",
   "sport.soccer": "Fútbol",
@@ -130,7 +151,7 @@ export const es = {
   "sport.boxing": "Boxeo",
   "sport.mma": "MMA",
   "sport.cricket": "Cricket",
-  
+
   // Misc
   "loading": "Cargando...",
   "error": "Error",
