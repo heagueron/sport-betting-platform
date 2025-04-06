@@ -1,0 +1,128 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family-main);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: none;
+  outline: none;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  height: 32px;
+}
+
+.btn-md {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-md);
+  height: 40px;
+}
+
+.btn-lg {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-lg);
+  height: 48px;
+}
+
+/* Button Variants */
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--neutral-100);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: var(--neutral-100);
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-dark);
+}
+
+.btn-success {
+  background-color: var(--success);
+  color: var(--neutral-100);
+}
+
+.btn-success:hover {
+  background-color: var(--success);
+  filter: brightness(0.9);
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: var(--neutral-100);
+}
+
+.btn-danger:hover {
+  background-color: var(--danger);
+  filter: brightness(0.9);
+}
+
+.btn-warning {
+  background-color: var(--warning);
+  color: var(--neutral-900);
+}
+
+.btn-warning:hover {
+  background-color: var(--warning);
+  filter: brightness(0.9);
+}
+
+.btn-info {
+  background-color: var(--info);
+  color: var(--neutral-100);
+}
+
+.btn-info:hover {
+  background-color: var(--info);
+  filter: brightness(0.9);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--primary);
+  border: var(--border-width-thin) solid var(--primary);
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-light);
+  color: var(--neutral-100);
+  border-color: var(--primary-light);
+}
+
+.btn-text {
+  background-color: transparent;
+  color: var(--primary);
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.btn-text:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* Full Width */
+.btn-full-width {
+  width: 100%;
+}
+
+/* Disabled State */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
