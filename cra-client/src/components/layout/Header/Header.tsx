@@ -58,6 +58,22 @@ const Header: React.FC<HeaderProps> = ({
                 <li className="nav-item">
                   <NavLink to="/about" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>{t('header.aboutUs')}</NavLink>
                 </li>
+                <li className="nav-item mobile-only">
+                  {isAuthenticated ? (
+                    <Button variant="outline" onClick={onLogout} className="modern-button mobile-button">
+                      {t('header.logout')}
+                    </Button>
+                  ) : (
+                    <>
+                      <Button variant="outline" onClick={onLogin} className="modern-button mobile-button login-button">
+                        {t('header.login')}
+                      </Button>
+                      <Button onClick={onSignup} className="modern-button mobile-button signup-button">
+                        {t('header.signup')}
+                      </Button>
+                    </>
+                  )}
+                </li>
               </ul>
             </nav>
           </div>
