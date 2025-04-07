@@ -8,7 +8,7 @@ export const register = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const { name, email, password } = req.body;
 
@@ -49,26 +49,28 @@ export const login = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const { email, password } = req.body;
 
     // Validate email & password
     if (!email || !password) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Please provide an email and password'
       });
+      return;
     }
 
     // Check for user
     const user = await loginUser({ email, password });
 
     if (!user) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         error: 'Invalid credentials'
       });
+      return;
     }
 
     // Generate token
@@ -120,16 +122,17 @@ export const getMe = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     // req.user is set in the auth middleware
     const user = await getUserById(req.user.id);
 
     if (!user) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'User not found'
       });
+      return;
     }
 
     // Remove password from response

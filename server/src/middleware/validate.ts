@@ -7,7 +7,7 @@ import { AnyZodObject, ZodError } from 'zod';
  * @returns Express middleware function
  */
 export const validate = (schema: AnyZodObject) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       // Validate request against schema
       await schema.parseAsync({
@@ -15,13 +15,13 @@ export const validate = (schema: AnyZodObject) => {
         query: req.query,
         params: req.params,
       });
-      
+
       // If validation passes, continue to the next middleware/controller
-      return next();
+      next();
     } catch (error) {
       // If validation fails, format the error messages and return a 400 response
       if (error instanceof ZodError) {
-        return res.status(400).json({
+        res.status(400).json({
           success: false,
           error: 'Validation error',
           details: error.errors.map((e) => ({
@@ -29,10 +29,11 @@ export const validate = (schema: AnyZodObject) => {
             message: e.message,
           })),
         });
+        return;
       }
-      
+
       // If it's not a ZodError, pass it to the next error handler
-      return next(error);
+      next(error);
     }
   };
 };

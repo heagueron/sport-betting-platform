@@ -58,19 +58,14 @@ export const updateEventStatusSchema = z.object({
   }),
   body: z.object({
     status: z.enum(['SCHEDULED', 'LIVE', 'COMPLETED', 'CANCELLED']),
-    result: z.string().optional().refine(
-      (result, ctx) => {
-        if (ctx.parent.status === 'COMPLETED' && !result) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Result is required when status is COMPLETED',
-          });
-          return false;
-        }
-        return true;
-      }
-    ),
-  }),
+    result: z.string().optional(),
+  }).refine(
+    (data) => !(data.status === 'COMPLETED' && !data.result),
+    {
+      message: 'Result is required when status is COMPLETED',
+      path: ['result'],
+    }
+  ),
 });
 
 // Schema for deleting an event
