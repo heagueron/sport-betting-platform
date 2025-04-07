@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Header.css';
 import Button from '../../common/Button/Button';
+import LanguageSelector from '../../common/LanguageSelector/LanguageSelector';
+
+// Define a type for the t function
+type TFunction = (key: string, options?: any) => string;
 
 interface HeaderProps {
   isAuthenticated?: boolean;
@@ -15,61 +21,79 @@ const Header: React.FC<HeaderProps> = ({
   onSignup,
   onLogout,
 }) => {
+  const { t } = useTranslation() as { t: TFunction };
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Add scroll event listener to change header background on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   return (
-    <header className="header">
-      <div className="container">
+    <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
         <div className="header-content">
-          <div className="header-logo">
-            <a href="/">
-              <h1>SBP</h1>
-            </a>
+          <div className="header-section left-section">
+            <nav className={`header-nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+              <ul className="nav-list">
+                <li className="nav-item">
+                  <NavLink to="/" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>{t('header.home')}</NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink to="/about" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>{t('header.aboutUs')}</NavLink>
+                </li>
+              </ul>
+            </nav>
           </div>
 
-          <nav className={`header-nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
-            <ul className="nav-list">
-              <li className="nav-item">
-                <a href="/" className="nav-link">Home</a>
-              </li>
-              <li className="nav-item">
-                <a href="/sports" className="nav-link">Sports</a>
-              </li>
-              <li className="nav-item">
-                <a href="/events" className="nav-link">Events</a>
-              </li>
-              <li className="nav-item">
-                <a href="/about" className="nav-link">About</a>
-              </li>
-            </ul>
-          </nav>
+          <div className="header-section center-section">
+            <div className="header-logo">
+              <Link to="/">
+                <img src="/images/Logo_SBP_removed_bg.png" alt="SBP Logo" className="logo-image" />
+              </Link>
+            </div>
+          </div>
 
-          <div className="header-actions">
-            {isAuthenticated ? (
-              <Button variant="outline" onClick={onLogout}>
-                Logout
-              </Button>
-            ) : (
-              <>
-                <Button variant="outline" onClick={onLogin}>
-                  Login
+          <div className="header-section right-section">
+            <div className="header-actions">
+              <LanguageSelector />
+              {isAuthenticated ? (
+                <Button variant="outline" onClick={onLogout} className="modern-button">
+                  {t('header.logout')}
                 </Button>
-                <Button onClick={onSignup}>
-                  Sign Up
-                </Button>
-              </>
-            )}
+              ) : (
+                <>
+                  <Button variant="outline" onClick={onLogin} className="modern-button login-button">
+                    {t('header.login')}
+                  </Button>
+                  <Button onClick={onSignup} className="modern-button signup-button">
+                    {t('header.signup')}
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
 
           <button className="mobile-menu-toggle" onClick={toggleMobileMenu}>
             <span className="menu-icon"></span>
           </button>
         </div>
-      </div>
     </header>
   );
 };

@@ -1,7 +1,13 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Footer.css';
 
+// Define a type for the t function
+type TFunction = (key: string, options?: any) => string;
+
 const Footer: React.FC = () => {
+  const { t } = useTranslation() as { t: TFunction };
   const currentYear = new Date().getFullYear();
 
   return (
@@ -11,31 +17,31 @@ const Footer: React.FC = () => {
           <div className="footer-section">
             <h3 className="footer-title">Sports Betting Platform</h3>
             <p className="footer-description">
-              Your premier destination for sports betting. Enjoy a wide range of sports events and betting options.
+              {t('footer.description')}
             </p>
           </div>
 
           <div className="footer-section">
-            <h4 className="footer-subtitle">Quick Links</h4>
+            <h4 className="footer-subtitle">{t('footer.quickLinks')}</h4>
             <ul className="footer-links">
-              <li><a href="/">Home</a></li>
-              <li><a href="/sports">Sports</a></li>
-              <li><a href="/events">Events</a></li>
-              <li><a href="/about">About</a></li>
+              <li><Link to="/">{t('header.home')}</Link></li>
+              <li><Link to="/sports">{t('sports.title')}</Link></li>
+              <li><Link to="/events">{t('events.title')}</Link></li>
+              <li><Link to="/about">{t('header.aboutUs')}</Link></li>
             </ul>
           </div>
 
           <div className="footer-section">
-            <h4 className="footer-subtitle">Legal</h4>
+            <h4 className="footer-subtitle">{t('footer.legal')}</h4>
             <ul className="footer-links">
-              <li><a href="/terms">Terms of Service</a></li>
-              <li><a href="/privacy">Privacy Policy</a></li>
-              <li><a href="/responsible-gambling">Responsible Gambling</a></li>
+              <li><a href="/terms">{t('footer.termsOfService')}</a></li>
+              <li><a href="/privacy">{t('footer.privacyPolicy')}</a></li>
+              <li><a href="/responsible-gambling">{t('footer.responsibleGambling')}</a></li>
             </ul>
           </div>
 
           <div className="footer-section">
-            <h4 className="footer-subtitle">Contact</h4>
+            <h4 className="footer-subtitle">{t('footer.contact')}</h4>
             <ul className="footer-links">
               <li><a href="mailto:support@sbp.com">support@sbp.com</a></li>
               <li><a href="tel:+1234567890">+1 (234) 567-890</a></li>
@@ -45,7 +51,7 @@ const Footer: React.FC = () => {
 
         <div className="footer-bottom">
           <p className="copyright">
-            &copy; {currentYear} Sports Betting Platform. All rights reserved.
+            {t('footer.copyright', { year: currentYear })}
           </p>
         </div>
       </div>

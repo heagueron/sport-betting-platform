@@ -1,0 +1,106 @@
+{
+  "header": {
+    "home": "Inicio",
+    "aboutUs": "Nosotros",
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar Sesión"
+  },
+  "home": {
+    "hero": {
+      "title": "AGANAR",
+      "description": "Experimenta la emoción de las apuestas deportivas junto a miles de entusiastas que confían en nuestra plataforma.",
+      "ctaButton": "Apostar Ahora"
+    },
+    "upcomingEvents": {
+      "title": "Próximos Eventos",
+      "viewButton": "Ver"
+    },
+    "sports": {
+      "football": "Fútbol",
+      "basketball": "Baloncesto",
+      "tennis": "Tenis",
+      "horseRacing": "Carreras de Caballos"
+    }
+  },
+  "sports": {
+    "title": "Deportes",
+    "description": "Explora todos los deportes disponibles y encuentra eventos para apostar.",
+    "events": "Eventos",
+    "viewEvents": "Ver Eventos"
+  },
+  "events": {
+    "title": "Próximos Eventos",
+    "description": "Explora todos los próximos eventos y realiza tus apuestas.",
+    "placeBet": "Apostar",
+    "viewDetails": "Ver Detalles",
+    "draw": "Empate"
+  },
+  "about": {
+    "title": "Nosotros",
+    "description": "Conoce más sobre la Plataforma de Apuestas Deportivas y nuestra misión.",
+    "ourStory": {
+      "title": "Nuestra Historia",
+      "paragraph1": "La Plataforma de Apuestas Deportivas fue fundada en 2025 con una misión simple: crear la experiencia de apuestas deportivas más fácil de usar y transparente en la web. Creemos que las apuestas deben ser divertidas, justas y accesibles para todos.",
+      "paragraph2": "Nuestro equipo de entusiastas deportivos y expertos en tecnología ha trabajado incansablemente para construir una plataforma que ofrece cuotas competitivas, una amplia gama de deportes y eventos, y una experiencia de usuario perfecta."
+    },
+    "ourValues": {
+      "title": "Nuestros Valores",
+      "transparency": {
+        "title": "Transparencia",
+        "description": "Creemos en la total transparencia en todas nuestras operaciones. Desde nuestro cálculo de cuotas hasta nuestras tarifas, todo está claramente explicado y accesible para nuestros usuarios."
+      },
+      "fairness": {
+        "title": "Justicia",
+        "description": "Estamos comprometidos a proporcionar cuotas justas y asegurar que todas las apuestas se liquiden con precisión y prontitud. Nuestra plataforma está diseñada para ser justa con todos los usuarios, independientemente de su experiencia en apuestas."
+      },
+      "responsibility": {
+        "title": "Responsabilidad",
+        "description": "Promovemos el juego responsable y proporcionamos herramientas para ayudar a nuestros usuarios a mantener el control sobre sus actividades de apuestas. Creemos que las apuestas deben ser agradables y no perjudiciales."
+      },
+      "innovation": {
+        "title": "Innovación",
+        "description": "Estamos constantemente innovando y mejorando nuestra plataforma para proporcionar la mejor experiencia posible a nuestros usuarios. Adoptamos nuevas tecnologías e ideas para mantenernos a la vanguardia."
+      }
+    },
+    "contactUs": {
+      "title": "Contáctanos",
+      "description": "Si tienes alguna pregunta, comentario o inquietud, no dudes en contactarnos. Siempre estamos felices de saber de nuestros usuarios.",
+      "email": "Correo Electrónico",
+      "phone": "Teléfono",
+      "address": "Dirección"
+    }
+  },
+  "notFound": {
+    "title": "Página No Encontrada",
+    "description": "La página que estás buscando puede haber sido eliminada, haber cambiado de nombre o estar temporalmente no disponible.",
+    "goHome": "Ir a Inicio"
+  },
+  "footer": {
+    "description": "Tu destino principal para apuestas deportivas. Disfruta de una amplia gama de eventos deportivos y opciones de apuestas.",
+    "quickLinks": "Enlaces Rápidos",
+    "legal": "Legal",
+    "termsOfService": "Términos de Servicio",
+    "privacyPolicy": "Política de Privacidad",
+    "responsibleGambling": "Juego Responsable",
+    "contact": "Contacto",
+    "copyright": "© {{year}} Plataforma de Apuestas Deportivas. Todos los derechos reservados."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "language": "Idioma",
+    "spanish": "Español",
+    "english": "Inglés"
+  }
+}

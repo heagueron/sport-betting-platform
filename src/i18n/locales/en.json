@@ -1,0 +1,106 @@
+{
+  "header": {
+    "home": "Home",
+    "aboutUs": "About Us",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout"
+  },
+  "home": {
+    "hero": {
+      "title": "Experience the Thrill of Sports Betting",
+      "description": "Join thousands of sports enthusiasts who trust our platform for the best odds, widest range of sports, and most exciting betting experience online.",
+      "ctaButton": "Let's Bet"
+    },
+    "upcomingEvents": {
+      "title": "Upcoming Events",
+      "viewButton": "View"
+    },
+    "sports": {
+      "football": "Football",
+      "basketball": "Basketball",
+      "tennis": "Tennis",
+      "horseRacing": "Horse Racing"
+    }
+  },
+  "sports": {
+    "title": "Sports",
+    "description": "Browse all available sports and find events to bet on.",
+    "events": "Events",
+    "viewEvents": "View Events"
+  },
+  "events": {
+    "title": "Upcoming Events",
+    "description": "Browse all upcoming events and place your bets.",
+    "placeBet": "Place Bet",
+    "viewDetails": "View Details",
+    "draw": "Draw"
+  },
+  "about": {
+    "title": "About Us",
+    "description": "Learn more about Sports Betting Platform and our mission.",
+    "ourStory": {
+      "title": "Our Story",
+      "paragraph1": "Sports Betting Platform was founded in 2025 with a simple mission: to create the most user-friendly and transparent sports betting experience on the web. We believe that betting should be fun, fair, and accessible to everyone.",
+      "paragraph2": "Our team of sports enthusiasts and technology experts has worked tirelessly to build a platform that offers competitive odds, a wide range of sports and events, and a seamless user experience."
+    },
+    "ourValues": {
+      "title": "Our Values",
+      "transparency": {
+        "title": "Transparency",
+        "description": "We believe in complete transparency in all our operations. From our odds calculation to our fees, everything is clearly explained and accessible to our users."
+      },
+      "fairness": {
+        "title": "Fairness",
+        "description": "We are committed to providing fair odds and ensuring that all bets are settled accurately and promptly. Our platform is designed to be fair to all users, regardless of their betting experience."
+      },
+      "responsibility": {
+        "title": "Responsibility",
+        "description": "We promote responsible gambling and provide tools to help our users maintain control over their betting activities. We believe that betting should be enjoyable and not harmful."
+      },
+      "innovation": {
+        "title": "Innovation",
+        "description": "We are constantly innovating and improving our platform to provide the best possible experience for our users. We embrace new technologies and ideas to stay ahead of the curve."
+      }
+    },
+    "contactUs": {
+      "title": "Contact Us",
+      "description": "If you have any questions, feedback, or concerns, please don't hesitate to contact us. We're always happy to hear from our users.",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address"
+    }
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
+    "goHome": "Go to Homepage"
+  },
+  "footer": {
+    "description": "Your premier destination for sports betting. Enjoy a wide range of sports events and betting options.",
+    "quickLinks": "Quick Links",
+    "legal": "Legal",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "responsibleGambling": "Responsible Gambling",
+    "contact": "Contact",
+    "copyright": "© {{year}} Sports Betting Platform. All rights reserved."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "language": "Language",
+    "spanish": "Spanish",
+    "english": "English"
+  }
+}

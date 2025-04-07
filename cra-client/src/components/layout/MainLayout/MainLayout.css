@@ -6,4 +6,6 @@
 
 .main-content {
   flex: 1;
+  /* Remove padding-top since the header is now fixed and transparent */
+  padding-top: 0;
 }
