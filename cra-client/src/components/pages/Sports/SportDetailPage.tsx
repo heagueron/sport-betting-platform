@@ -34,53 +34,53 @@ interface Event {
 const SportDetailPage: React.FC = () => {
   const { sportId } = useParams<{ sportId: string }>();
   const { t } = useTranslation() as { t: TFunction };
-  
+
   // Mock data for sports - in a real app, this would come from an API
   const sports: Sport[] = [
-    { 
-      id: 1, 
-      name: 'Football', 
-      image: '/images/football10.png', 
+    {
+      id: 1,
+      name: 'Football',
+      image: '/images/football10.png',
       eventCount: 24,
       description: 'Football, also known as soccer in some countries, is the world\'s most popular sport. It is played between two teams of 11 players each, with a spherical ball. The objective is to score by getting the ball into the opposing goal.',
       popularLeagues: ['Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1']
     },
-    { 
-      id: 2, 
-      name: 'Basketball', 
-      image: '/images/basketball3.png', 
+    {
+      id: 2,
+      name: 'Basketball',
+      image: '/images/basketball3.png',
       eventCount: 18,
       description: 'Basketball is a team sport in which two teams of five players each try to score points by throwing a ball through a hoop (the basket) under organized rules. It is played on both indoor and outdoor courts.',
       popularLeagues: ['NBA', 'EuroLeague', 'NCAA', 'FIBA World Cup']
     },
-    { 
-      id: 3, 
-      name: 'Tennis', 
-      image: '/images/tennis5.png', 
+    {
+      id: 3,
+      name: 'Tennis',
+      image: '/images/tennis5.png',
       eventCount: 12,
       description: 'Tennis is a racket sport that can be played individually against a single opponent (singles) or between two teams of two players each (doubles). Each player uses a tennis racket that is strung with cord to strike a hollow rubber ball covered with felt over or around a net and into the opponent\'s court.',
       popularLeagues: ['Grand Slam Tournaments', 'ATP Tour', 'WTA Tour', 'Davis Cup']
     },
-    { 
-      id: 4, 
-      name: 'Baseball', 
-      image: '/images/baseball1.png', 
+    {
+      id: 4,
+      name: 'Baseball',
+      image: '/images/baseball1.png',
       eventCount: 8,
       description: 'Baseball is a bat-and-ball game played between two opposing teams, typically of nine players each, that take turns batting and fielding. The game proceeds when a player on the fielding team, called the pitcher, throws a ball which a player on the batting team tries to hit with a bat.',
       popularLeagues: ['MLB', 'NPB', 'KBO League', 'WBSC Premier12']
     },
-    { 
-      id: 5, 
-      name: 'Boxing', 
-      image: '/images/boxing1.png', 
+    {
+      id: 5,
+      name: 'Boxing',
+      image: '/images/boxing1.png',
       eventCount: 5,
       description: 'Boxing is a combat sport in which two people, usually wearing protective gloves, throw punches at each other for a predetermined amount of time in a boxing ring.',
       popularLeagues: ['WBC', 'WBA', 'IBF', 'WBO']
     },
-    { 
-      id: 6, 
-      name: 'Horse Racing', 
-      image: '/images/horse_racing.png', 
+    {
+      id: 6,
+      name: 'Horse Racing',
+      image: '/images/horse_racing.png',
       eventCount: 7,
       description: 'Horse racing is an equestrian performance sport, typically involving two or more horses ridden by jockeys over a set distance for competition.',
       popularLeagues: ['Triple Crown', 'Breeders\' Cup', 'Royal Ascot', 'Dubai World Cup']
@@ -180,7 +180,7 @@ const SportDetailPage: React.FC = () => {
 
   // Find the sport with the matching ID
   const sport = sports.find(s => s.id === Number(sportId));
-  
+
   // Filter events for this sport
   const sportEvents = events.filter(e => e.sportId === Number(sportId));
 
@@ -201,9 +201,9 @@ const SportDetailPage: React.FC = () => {
       <div className="sport-detail-page">
         <div className="container">
           <div className="sport-not-found">
-            <h2>{t('sports.notFound')}</h2>
-            <p>{t('sports.notFoundDescription')}</p>
-            <Link to="/sports" className="back-button">{t('sports.backToSports')}</Link>
+            <h2>{t('sportsList.notFound')}</h2>
+            <p>{t('sportsList.notFoundDescription')}</p>
+            <Link to="/sports" className="back-button">{t('sportsList.backToSports')}</Link>
           </div>
         </div>
       </div>
@@ -215,7 +215,7 @@ const SportDetailPage: React.FC = () => {
       <div className="sport-detail-header">
         <div className="container">
           <div className="breadcrumbs">
-            <Link to="/sports">{t('sports.title')}</Link> &gt; <span>{sport.name}</span>
+            <Link to="/sports">{t('sportsList.title')}</Link> &gt; <span>{sport.name}</span>
           </div>
           <div className="sport-header-content">
             <div className="sport-image">
@@ -223,7 +223,7 @@ const SportDetailPage: React.FC = () => {
             </div>
             <div className="sport-info">
               <h1>{sport.name}</h1>
-              <p className="event-count">{sport.eventCount} {t('sports.events')}</p>
+              <p className="event-count">{sport.eventCount} {t('sportsList.events')}</p>
               <p className="sport-description">{sport.description}</p>
             </div>
           </div>
@@ -233,13 +233,13 @@ const SportDetailPage: React.FC = () => {
       <div className="container">
         <div className="sport-detail-content">
           <div className="popular-leagues">
-            <h2>{t('sports.popularLeagues')}</h2>
+            <h2>{t('sportsList.popularLeagues')}</h2>
             <div className="leagues-list">
               {sport.popularLeagues.map((league, index) => (
                 <div key={index} className="league-item">
                   <span>{league}</span>
                   <Link to={`/sports/${sport.id}/leagues/${index + 1}`} className="view-button">
-                    {t('sports.viewEvents')}
+                    {t('sportsList.viewEvents')}
                   </Link>
                 </div>
               ))}
@@ -247,7 +247,7 @@ const SportDetailPage: React.FC = () => {
           </div>
 
           <div className="upcoming-events">
-            <h2>{t('sports.upcomingEvents')}</h2>
+            <h2>{t('sportsList.upcomingEvents')}</h2>
             {sportEvents.length > 0 ? (
               <div className="events-list">
                 {sportEvents.map((event) => (
@@ -290,7 +290,7 @@ const SportDetailPage: React.FC = () => {
               </div>
             ) : (
               <div className="no-events">
-                <p>{t('sports.noEvents')}</p>
+                <p>{t('sportsList.noEvents')}</p>
               </div>
             )}
           </div>
