@@ -1,5 +1,5 @@
 // Common types used across the application
-import { Role, EventStatus, BetStatus } from '@prisma/client';
+import { Role, EventStatus, BetStatus, TransactionType, TransactionStatus } from '@prisma/client';
 
 export interface ErrorResponse {
   success: boolean;
@@ -63,4 +63,43 @@ export interface EventData {
   endTime?: Date;
   status?: EventStatus;
   participants: ParticipantData[];
+}
+
+export interface TransactionData {
+  userId: string;
+  amount: number;
+  type: TransactionType;
+  status?: TransactionStatus;
+  description?: string;
+  notes?: string;
+}
+
+export interface AdminLogData {
+  userId: string;
+  action: string;
+  details?: string;
+  ipAddress?: string;
+}
+
+export interface DashboardStats {
+  totalUsers: number;
+  newUsersToday: number;
+  totalTransactions: number;
+  pendingTransactions: number;
+  totalDeposits: number;
+  totalWithdrawals: number;
+}
+
+export interface UserStats {
+  totalUsers: number;
+  activeUsers: number;
+  adminUsers: number;
+  usersByDate: { date: string; count: number }[];
+}
+
+export interface TransactionStats {
+  totalAmount: number;
+  byStatus: { status: TransactionStatus; count: number }[];
+  byType: { type: TransactionType; count: number }[];
+  recentTransactions: any[];
 }

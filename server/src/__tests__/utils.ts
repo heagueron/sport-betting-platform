@@ -1,6 +1,6 @@
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
-import { PrismaClient, User, Role } from '@prisma/client';
+import { PrismaClient, User, Role, TransactionType, TransactionStatus } from '@prisma/client';
 import app from '../app';
 import { prisma } from './setup';
 
@@ -200,3 +200,75 @@ export const createBet = async (userId: string, eventId: string, overrides: any 
     data: betData
   });
 };
+
+/**
+ * Create a transaction
+ * @param userId User ID
+ * @param overrides Optional overrides for transaction properties
+ * @returns Created transaction
+ */
+export const createTransaction = async (userId: string, overrides: any = {}): Promise<any> => {
+  const transactionData = {
+    userId,
+    amount: 100,
+    type: TransactionType.DEPOSIT,
+    status: TransactionStatus.PENDING,
+    description: 'Test transaction',
+    ...overrides
+  };
+
+  return prisma.transaction.create({
+    data: transactionData
+  });
+};
+
+/**
+ * Create an admin log
+ * @param userId Admin user ID
+ * @param overrides Optional overrides for admin log properties
+ * @returns Created admin log
+ */
+export const createAdminLog = async (userId: string, overrides: any = {}): Promise<any> => {
+  const logData = {
+    userId,
+    action: 'TEST_ACTION',
+    details: 'Test admin action',
+    ipAddress: '127.0.0.1',
+    ...overrides
+  };
+
+  return prisma.adminLog.create({
+    data: logData
+  });
+};
+
+/**
+ * Create multiple users
+ * @param count Number of users to create
+ * @param overrides Optional overrides for user properties
+ * @returns Array of created users
+ */
+export const createMultipleUsers = async (count: number, overrides: any = {}): Promise<User[]> => {
+  const users = [];
+  for (let i = 0; i < count; i++) {
+    users.push(await createUser(overrides));
+  }
+  return users;
+};
+
+/**
+ * Create multiple transactions
+ * @param userId User ID
+ * @param count Number of transactions to create
+ * @param overrides Optional overrides for transaction properties
+ * @returns Array of created transactions
+ */
+export const createMultipleTransactions = async (userId: string, count: number, overrides: any = {}): Promise<any[]> => {
+  const transactions = [];
+  for (let i = 0; i < count; i++) {
+    transactions.push(await createTransaction(userId, overrides));
+  }
+  return transactions;
+};
+
+

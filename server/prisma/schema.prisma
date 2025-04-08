@@ -20,7 +20,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  bets      Bet[]
+  bets         Bet[]
+  transactions Transaction[]
+  adminLogs    AdminLog[]
 
   @@map("users")
 }
@@ -106,4 +108,47 @@ enum BetStatus {
   WON
   LOST
   CANCELLED
+}
+
+model Transaction {
+  id          String           @id @default(uuid())
+  amount      Float
+  type        TransactionType
+  status      TransactionStatus @default(PENDING)
+  description String?
+  notes       String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+
+  @@map("transactions")
+}
+
+model AdminLog {
+  id          String    @id @default(uuid())
+  action      String
+  details     String?
+  ipAddress   String?
+  createdAt   DateTime  @default(now())
+
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@map("admin_logs")
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  BET
+  WINNING
+}
+
+enum TransactionStatus {
+  PENDING
+  APROBADA
+  COMPLETADA
+  FALLIDA
 }
