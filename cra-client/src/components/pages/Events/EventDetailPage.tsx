@@ -32,7 +32,7 @@ interface Event {
 const EventDetailPage: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const { t } = useTranslation() as { t: TFunction };
-  
+
   // Mock data for events - in a real app, this would come from an API
   const events: Event[] = [
     {
@@ -47,7 +47,7 @@ const EventDetailPage: React.FC = () => {
         away: { name: 'Liverpool', odds: 1.8, logo: '/images/football10.png' },
       },
       draw: 3.2,
-      description: 'One of the biggest rivalries in English football. Manchester United hosts Liverpool at Old Trafford in what promises to be an exciting Premier League clash.',
+      description: 'Una de las mayores rivalidades del fútbol inglés. El Manchester United recibe al Liverpool en Old Trafford en lo que promete ser un emocionante enfrentamiento de la Premier League.',
       venue: 'Old Trafford, Manchester'
     },
     {
@@ -61,7 +61,7 @@ const EventDetailPage: React.FC = () => {
         home: { name: 'LA Lakers', odds: 1.6, logo: '/images/basketball3.png' },
         away: { name: 'Chicago Bulls', odds: 2.3, logo: '/images/basketball3.png' },
       },
-      description: 'NBA regular season game between the Los Angeles Lakers and the Chicago Bulls.',
+      description: 'Partido de temporada regular de la NBA entre Los Angeles Lakers y Chicago Bulls.',
       venue: 'Staples Center, Los Angeles'
     },
     {
@@ -75,7 +75,7 @@ const EventDetailPage: React.FC = () => {
         home: { name: 'Rafael Nadal', odds: 2.1, logo: '/images/tennis5.png' },
         away: { name: 'Novak Djokovic', odds: 1.9, logo: '/images/tennis5.png' },
       },
-      description: 'Grand Slam final match between two tennis legends, Rafael Nadal and Novak Djokovic.',
+      description: 'Partido final de Grand Slam entre dos leyendas del tenis, Rafael Nadal y Novak Djokovic.',
       venue: 'Roland Garros, Paris'
     },
     {
@@ -89,7 +89,7 @@ const EventDetailPage: React.FC = () => {
         home: { name: 'New York Yankees', odds: 1.7, logo: '/images/baseball1.png' },
         away: { name: 'Boston Red Sox', odds: 2.2, logo: '/images/baseball1.png' },
       },
-      description: 'MLB regular season game between historic rivals New York Yankees and Boston Red Sox.',
+      description: 'Partido de temporada regular de la MLB entre los históricos rivales New York Yankees y Boston Red Sox.',
       venue: 'Yankee Stadium, New York'
     },
   ];
@@ -100,7 +100,7 @@ const EventDetailPage: React.FC = () => {
   // Function to format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('es-ES', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -128,16 +128,11 @@ const EventDetailPage: React.FC = () => {
     <div className="event-detail-page">
       <div className="event-detail-header">
         <div className="container">
-          <div className="breadcrumbs">
-            <Link to="/events">{t('events.title')}</Link> &gt; 
-            <Link to={`/sports/${event.sportId}`}> {event.sport}</Link> &gt; 
-            <span> {event.title}</span>
-          </div>
           <h1>{event.title}</h1>
           <div className="event-meta">
             <span className="event-date">{formatDate(event.date)}</span>
             <span className="event-venue">{event.venue}</span>
-            <span className="event-status">{event.status}</span>
+            <span className="event-status">{t('events.status')}</span>
           </div>
         </div>
       </div>

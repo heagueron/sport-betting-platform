@@ -4,6 +4,28 @@
   margin-right: var(--spacing-md);
 }
 
+@media (max-width: 1024px) {
+  .language-selector {
+    margin-right: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 768px) {
+  .language-selector {
+    margin-right: var(--spacing-xs);
+  }
+
+  .language-btn {
+    padding: var(--spacing-xs) var(--spacing-xs);
+    font-size: var(--font-size-xs);
+  }
+
+  .language-divider {
+    margin: 0 2px;
+    font-size: var(--font-size-xs);
+  }
+}
+
 .language-btn {
   background: none;
   border: none;

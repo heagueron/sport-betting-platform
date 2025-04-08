@@ -15,7 +15,7 @@ const Footer: React.FC = () => {
       <div className="container">
         <div className="footer-content">
           <div className="footer-section">
-            <h3 className="footer-title">Sports Betting Platform</h3>
+            <h3 className="footer-title">AGANAR</h3>
             <p className="footer-description">
               {t('footer.description')}
             </p>

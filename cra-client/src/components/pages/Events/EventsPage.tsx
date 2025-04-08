@@ -60,7 +60,7 @@ const EventsPage: React.FC = () => {
   // Function to format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('es-ES', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
@@ -71,11 +71,8 @@ const EventsPage: React.FC = () => {
 
   return (
     <div className="events-page">
-      <div className="page-header">
+      <div className="events-title-container">
         <h1>{t('events.title')}</h1>
-        <p className="page-description">
-          {t('events.description')}
-        </p>
       </div>
 
       <div className="container">
@@ -84,11 +81,11 @@ const EventsPage: React.FC = () => {
             <div key={event.id} className="event-card">
               <div className="event-header">
                 <div>
-                  <span className="sport-badge">{event.sport}</span>
+                  <span className="sport-badge">{t(`home.sports.${event.sport.toLowerCase()}`)}</span>
                   <h3 className="event-title">{event.title}</h3>
                   <p className="event-date">{formatDate(event.date)}</p>
                 </div>
-                <span className="status-badge">{event.status}</span>
+                <span className="status-badge">{t('events.status')}</span>
               </div>
 
               <div className="event-odds">
