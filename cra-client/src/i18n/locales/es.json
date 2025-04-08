@@ -14,7 +14,8 @@
     },
     "upcomingEvents": {
       "title": "Próximos Eventos",
-      "viewButton": "Ver"
+      "viewButton": "Ver",
+      "moreEvents": "Más eventos"
     },
     "sports": {
       "football": "Fútbol",
@@ -27,14 +28,27 @@
     "title": "Deportes",
     "description": "Explora todos los deportes disponibles y encuentra eventos para apostar.",
     "events": "Eventos",
-    "viewEvents": "Ver Eventos"
+    "viewEvents": "Ver Eventos",
+    "sportDescription": "Consulta los últimos eventos de {{sport}} y realiza tus apuestas.",
+    "popularLeagues": "Ligas Populares",
+    "upcomingEvents": "Próximos Eventos",
+    "noEvents": "No hay eventos próximos para este deporte.",
+    "notFound": "Deporte no encontrado",
+    "notFoundDescription": "El deporte que estás buscando no existe o ha sido eliminado.",
+    "backToSports": "Volver a Deportes"
   },
   "events": {
     "title": "Próximos Eventos",
     "description": "Explora todos los próximos eventos y realiza tus apuestas.",
     "placeBet": "Apostar",
     "viewDetails": "Ver Detalles",
-    "draw": "Empate"
+    "draw": "Empate",
+    "odds": "Cuota",
+    "description": "Descripción",
+    "relatedEvents": "Eventos Relacionados",
+    "notFound": "Evento no encontrado",
+    "notFoundDescription": "El evento que estás buscando no existe o ha sido eliminado.",
+    "backToEvents": "Volver a Eventos"
   },
   "about": {
     "title": "Nosotros",
@@ -73,8 +87,8 @@
   },
   "notFound": {
     "title": "Página No Encontrada",
-    "description": "La página que estás buscando puede haber sido eliminada, haber cambiado de nombre o estar temporalmente no disponible.",
-    "goHome": "Ir a Inicio"
+    "description": "La página que buscas no existe",
+    "goHome": "Inicio"
   },
   "footer": {
     "description": "Tu destino principal para apuestas deportivas. Disfruta de una amplia gama de eventos deportivos y opciones de apuestas.",
@@ -84,7 +98,7 @@
     "privacyPolicy": "Política de Privacidad",
     "responsibleGambling": "Juego Responsable",
     "contact": "Contacto",
-    "copyright": "© {{year}} Plataforma de Apuestas Deportivas. Todos los derechos reservados."
+    "copyright": "© {{year}} AGANAR. Todos los derechos reservados."
   },
   "common": {
     "loading": "Cargando...",

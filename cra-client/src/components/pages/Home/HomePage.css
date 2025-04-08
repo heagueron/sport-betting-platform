@@ -173,6 +173,29 @@
   color: var(--neutral-100);
 }
 
+.more-events {
+  border-top: 1px dashed var(--neutral-300);
+  padding-top: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  display: flex;
+  justify-content: center;
+}
+
+.more-events-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-md);
+  transition: color var(--transition-fast);
+  display: flex;
+  align-items: center;
+}
+
+.more-events-link:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
 /* Sports Cards Section */
 .sports-cards {
   display: grid;

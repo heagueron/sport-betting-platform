@@ -1,7 +1,13 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './EventsPage.css';
 
+// Define a type for the t function
+type TFunction = (key: string, options?: any) => string;
+
 const EventsPage: React.FC = () => {
+  const { t } = useTranslation() as { t: TFunction };
   // Mock data for events
   const events = [
     {
@@ -66,9 +72,9 @@ const EventsPage: React.FC = () => {
   return (
     <div className="events-page">
       <div className="page-header">
-        <h1>Upcoming Events</h1>
+        <h1>{t('events.title')}</h1>
         <p className="page-description">
-          Browse all upcoming events and place your bets.
+          {t('events.description')}
         </p>
       </div>
 
@@ -93,7 +99,7 @@ const EventsPage: React.FC = () => {
 
                 {event.draw && (
                   <div className="draw">
-                    <span className="draw-label">Draw</span>
+                    <span className="draw-label">{t('events.draw')}</span>
                     <span className="odds-badge">{event.draw}</span>
                   </div>
                 )}
@@ -105,8 +111,10 @@ const EventsPage: React.FC = () => {
               </div>
 
               <div className="event-actions">
-                <button className="bet-button">Place Bet</button>
-                <button className="details-button">View Details</button>
+                <button className="bet-button">{t('events.placeBet')}</button>
+                <Link to={`/events/${event.id}`} className="details-button">
+                  {t('events.viewDetails')}
+                </Link>
               </div>
             </div>
           ))}

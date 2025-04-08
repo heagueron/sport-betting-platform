@@ -14,7 +14,8 @@
     },
     "upcomingEvents": {
       "title": "Upcoming Events",
-      "viewButton": "View"
+      "viewButton": "View",
+      "moreEvents": "More events"
     },
     "sports": {
       "football": "Football",
@@ -27,14 +28,27 @@
     "title": "Sports",
     "description": "Browse all available sports and find events to bet on.",
     "events": "Events",
-    "viewEvents": "View Events"
+    "viewEvents": "View Events",
+    "sportDescription": "Check out the latest {{sport}} events and place your bets.",
+    "popularLeagues": "Popular Leagues",
+    "upcomingEvents": "Upcoming Events",
+    "noEvents": "No upcoming events for this sport.",
+    "notFound": "Sport not found",
+    "notFoundDescription": "The sport you are looking for does not exist or has been removed.",
+    "backToSports": "Back to Sports"
   },
   "events": {
     "title": "Upcoming Events",
     "description": "Browse all upcoming events and place your bets.",
     "placeBet": "Place Bet",
     "viewDetails": "View Details",
-    "draw": "Draw"
+    "draw": "Draw",
+    "odds": "Odds",
+    "description": "Description",
+    "relatedEvents": "Related Events",
+    "notFound": "Event not found",
+    "notFoundDescription": "The event you are looking for does not exist or has been removed.",
+    "backToEvents": "Back to Events"
   },
   "about": {
     "title": "About Us",
@@ -73,8 +87,8 @@
   },
   "notFound": {
     "title": "Page Not Found",
-    "description": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
-    "goHome": "Go to Homepage"
+    "description": "The page you are looking for does not exist",
+    "goHome": "Home"
   },
   "footer": {
     "description": "Your premier destination for sports betting. Enjoy a wide range of sports events and betting options.",
@@ -84,7 +98,7 @@
     "privacyPolicy": "Privacy Policy",
     "responsibleGambling": "Responsible Gambling",
     "contact": "Contact",
-    "copyright": "© {{year}} Sports Betting Platform. All rights reserved."
+    "copyright": "© {{year}} AGANAR. All rights reserved."
   },
   "common": {
     "loading": "Loading...",

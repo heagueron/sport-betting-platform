@@ -45,6 +45,11 @@ const HomePage: React.FC = () => {
                       <Link to={`/events/${event.id}`} className="event-link">{t('home.upcomingEvents.viewButton')}</Link>
                     </li>
                   ))}
+                  <li className="event-item more-events">
+                    <Link to="/events" className="more-events-link">
+                      {t('home.upcomingEvents.moreEvents')} →
+                    </Link>
+                  </li>
                 </ul>
               </div>
             </div>
