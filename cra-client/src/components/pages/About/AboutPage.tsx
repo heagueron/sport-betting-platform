@@ -9,7 +9,7 @@ const AboutPage: React.FC = () => {
   const { t } = useTranslation() as { t: TFunction };
   return (
     <div className="about-page">
-      <div className="container">
+      <div className="page-container">
         <h1 className="about-main-title">{t('about.title')}</h1>
         <section className="about-section">
           <h2>{t('about.ourStory.title')}</h2>

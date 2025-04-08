@@ -34,6 +34,11 @@ export interface RegisterData {
   role?: Role;
 }
 
+export interface UpdateUserData {
+  name?: string;
+  email?: string;
+}
+
 export interface BetData {
   eventId: string;
   amount: number;

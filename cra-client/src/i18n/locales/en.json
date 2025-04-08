@@ -118,5 +118,46 @@
     "language": "Language",
     "spanish": "Spanish",
     "english": "English"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "namePlaceholder": "Enter your name",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "noAccount": "Don't have an account?",
+    "registerNow": "Register now",
+    "alreadyHaveAccount": "Already have an account?",
+    "loginHere": "Login here",
+    "validation": {
+      "nameRequired": "Name is required",
+      "nameLength": "Name must be at least 2 characters long",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email format",
+      "passwordRequired": "Password is required",
+      "passwordLength": "Password must be at least 6 characters long",
+      "confirmPasswordRequired": "Please confirm your password",
+      "passwordsDoNotMatch": "Passwords do not match"
+    }
+  },
+  "profile": {
+    "title": "My Profile",
+    "personalInfo": "Personal Information",
+    "role": "Role",
+    "balance": "Balance",
+    "memberSince": "Member Since",
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "Failed to update profile",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "passwordSuccess": "Password updated successfully"
   }
 }

@@ -1,0 +1,105 @@
+.profile-page {
+  padding: var(--spacing-xl) var(--spacing-md);
+  min-height: 80vh;
+}
+
+.profile-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.profile-title {
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--neutral-900);
+}
+
+.profile-card {
+  margin-bottom: var(--spacing-lg);
+}
+
+.profile-card-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+}
+
+.profile-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  font-size: var(--font-size-lg);
+  color: var(--neutral-600);
+}
+
+.profile-success-message {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: var(--success);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.profile-error-message {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--danger);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.profile-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.profile-info-label {
+  font-weight: var(--font-weight-medium);
+  color: var(--neutral-700);
+  font-size: var(--font-size-sm);
+}
+
+.profile-info-value {
+  font-size: var(--font-size-md);
+  color: var(--neutral-900);
+}
+
+.profile-actions {
+  margin-top: var(--spacing-md);
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.profile-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .profile-info-item {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .profile-info-label {
+    width: 150px;
+    flex-shrink: 0;
+  }
+}

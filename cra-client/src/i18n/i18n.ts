@@ -6,7 +6,7 @@ const translationEN = require('./locales/en.json');
 const translationES = require('./locales/es.json');
 
 // the translations
-const resources = {
+export const resources = {
   en: {
     translation: translationEN
   },
@@ -23,6 +23,7 @@ i18n
     resources,
     lng: 'es', // default language
     fallbackLng: 'en',
+    defaultNS: 'translation',
     interpolation: {
       escapeValue: false // react already safes from xss
     }

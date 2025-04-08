@@ -3,27 +3,34 @@ import { BrowserRouter } from 'react-router-dom';
 import './App.css';
 import MainLayout from './components/layout/MainLayout/MainLayout';
 import AppRoutes from './routes/AppRoutes';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import AuthModal, { AuthModalMode } from './components/auth/AuthModal/AuthModal';
 
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+const AppContent = () => {
+  const { isAuthenticated, logout } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<AuthModalMode>('login');
 
   const handleLogin = () => {
-    alert('Login clicked');
-    // In a real app, this would open a login modal or redirect to a login page
+    setAuthModalMode('login');
+    setAuthModalOpen(true);
   };
 
   const handleSignup = () => {
-    alert('Sign up clicked');
-    // In a real app, this would open a signup modal or redirect to a signup page
+    setAuthModalMode('register');
+    setAuthModalOpen(true);
   };
 
-  const handleLogout = () => {
-    alert('Logout clicked');
-    // In a real app, this would handle the logout process
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  const closeAuthModal = () => {
+    setAuthModalOpen(false);
   };
 
   return (
-    <BrowserRouter>
+    <>
       <MainLayout
         isAuthenticated={isAuthenticated}
         onLogin={handleLogin}
@@ -32,6 +39,22 @@ function App() {
       >
         <AppRoutes />
       </MainLayout>
+
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={closeAuthModal}
+        initialMode={authModalMode}
+      />
+    </>
+  );
+};
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </BrowserRouter>
   );
 }

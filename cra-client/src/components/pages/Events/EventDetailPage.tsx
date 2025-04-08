@@ -113,7 +113,7 @@ const EventDetailPage: React.FC = () => {
   if (!event) {
     return (
       <div className="event-detail-page">
-        <div className="container">
+        <div className="page-container">
           <div className="event-not-found">
             <h2>{t('events.notFound')}</h2>
             <p>{t('events.notFoundDescription')}</p>
@@ -127,7 +127,7 @@ const EventDetailPage: React.FC = () => {
   return (
     <div className="event-detail-page">
       <div className="event-detail-header">
-        <div className="container">
+        <div className="page-container">
           <h1>{event.title}</h1>
           <div className="event-meta">
             <span className="event-date">{formatDate(event.date)}</span>
@@ -137,7 +137,7 @@ const EventDetailPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="container">
+      <div className="page-container">
         <div className="event-detail-content">
           <div className="event-description">
             <h2>{t('events.description')}</h2>

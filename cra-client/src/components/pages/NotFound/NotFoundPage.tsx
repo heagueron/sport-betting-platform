@@ -7,7 +7,7 @@ const NotFoundPage: React.FC = () => {
   const { t } = useTranslation() as { t: (key: string) => string };
   return (
     <div className="not-found-page">
-      <div className="not-found-container">
+      <div className="page-container not-found-container">
         <div className="not-found-image-container">
           <img src="/images/404_Athlet_no_bg.png" alt="404 Athlete" className="not-found-image" />
         </div>

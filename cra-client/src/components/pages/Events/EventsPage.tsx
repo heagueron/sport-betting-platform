@@ -75,7 +75,7 @@ const EventsPage: React.FC = () => {
         <h1>{t('events.title')}</h1>
       </div>
 
-      <div className="container">
+      <div className="page-container">
         <div className="events-list">
           {events.map((event) => (
             <div key={event.id} className="event-card">

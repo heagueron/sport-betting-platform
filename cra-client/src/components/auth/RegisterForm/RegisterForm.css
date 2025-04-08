@@ -1,0 +1,42 @@
+.register-form-container {
+  width: 100%;
+}
+
+.register-form {
+  width: 100%;
+}
+
+.form-error {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--danger);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.form-actions {
+  margin-top: var(--spacing-md);
+}
+
+.form-footer {
+  margin-top: var(--spacing-md);
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--neutral-700);
+}
+
+.text-button {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+  text-decoration: underline;
+  transition: color var(--transition-fast);
+}
+
+.text-button:hover {
+  color: var(--primary-dark);
+}

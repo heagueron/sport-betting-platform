@@ -24,7 +24,7 @@ const SportsPage: React.FC = () => {
         <h1>{t('sportsList.title')}</h1>
       </div>
 
-      <div className="container">
+      <div className="page-container">
         <div className="sports-grid">
           {sports.map((sport) => (
             <div key={sport.id} className="sport-card">

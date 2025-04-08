@@ -1,0 +1,7 @@
+.auth-modal {
+  max-width: 450px;
+}
+
+.auth-modal-content {
+  padding: var(--spacing-sm) 0;
+}

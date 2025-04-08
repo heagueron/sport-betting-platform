@@ -117,6 +117,14 @@ main {
   padding: var(--spacing-xl) 0;
 }
 
+/* Container for page content */
+.page-container {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-xl);
+  width: 100%;
+}
+
 .App-footer {
   background-color: var(--neutral-800);
   color: var(--neutral-100);

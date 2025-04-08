@@ -75,3 +75,22 @@ export const generateToken = (userId: string): string => {
 
   return jwt.sign({ id: userId }, secret, options);
 };
+
+/**
+ * Update user details
+ * @param userId User ID
+ * @param userData User data to update
+ * @returns Updated user
+ */
+export const updateUserDetails = async (userId: string, userData: { name?: string; email?: string }): Promise<User> => {
+  // Update user
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      name: userData.name,
+      email: userData.email,
+    },
+  });
+
+  return user;
+};

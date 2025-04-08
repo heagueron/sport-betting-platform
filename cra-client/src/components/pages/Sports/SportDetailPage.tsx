@@ -187,7 +187,7 @@ const SportDetailPage: React.FC = () => {
   // Function to format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('es-ES', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
@@ -199,7 +199,7 @@ const SportDetailPage: React.FC = () => {
   if (!sport) {
     return (
       <div className="sport-detail-page">
-        <div className="container">
+        <div className="page-container">
           <div className="sport-not-found">
             <h2>{t('sportsList.notFound')}</h2>
             <p>{t('sportsList.notFoundDescription')}</p>
@@ -213,7 +213,7 @@ const SportDetailPage: React.FC = () => {
   return (
     <div className="sport-detail-page">
       <div className="sport-detail-header">
-        <div className="container">
+        <div className="page-container">
           <div className="breadcrumbs">
             <Link to="/sports">{t('sportsList.title')}</Link> &gt; <span>{sport.name}</span>
           </div>
@@ -230,7 +230,7 @@ const SportDetailPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="container">
+      <div className="page-container">
         <div className="sport-detail-content">
           <div className="popular-leagues">
             <h2>{t('sportsList.popularLeagues')}</h2>
@@ -257,7 +257,7 @@ const SportDetailPage: React.FC = () => {
                         <h3 className="event-title">{event.title}</h3>
                         <p className="event-date">{formatDate(event.date)}</p>
                       </div>
-                      <span className="status-badge">{event.status}</span>
+                      <span className="status-badge">{t('events.status')}</span>
                     </div>
 
                     <div className="event-odds">

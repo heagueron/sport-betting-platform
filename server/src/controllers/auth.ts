@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { registerUser, loginUser, getUserById, generateToken } from '../services/auth';
+import { registerUser, loginUser, getUserById, generateToken, updateUserDetails } from '../services/auth';
 
 // @desc    Register user
 // @route   POST /api/auth/register
@@ -134,6 +134,30 @@ export const getMe = async (
       });
       return;
     }
+
+    // Remove password from response
+    const { password: _, ...userWithoutPassword } = user;
+
+    res.status(200).json({
+      success: true,
+      data: userWithoutPassword
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update user details
+// @route   PUT /api/auth/updatedetails
+// @access  Private
+export const updateDetails = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    // Update user details
+    const user = await updateUserDetails(req.user.id, req.body);
 
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user;

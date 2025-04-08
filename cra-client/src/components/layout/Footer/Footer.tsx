@@ -25,7 +25,7 @@ const Footer: React.FC = () => {
             <h4 className="footer-subtitle">{t('footer.quickLinks')}</h4>
             <ul className="footer-links">
               <li><Link to="/">{t('header.home')}</Link></li>
-              <li><Link to="/sports">{t('sports.title')}</Link></li>
+              <li><Link to="/sports">{t('sportsList.title')}</Link></li>
               <li><Link to="/events">{t('events.title')}</Link></li>
               <li><Link to="/about">{t('header.aboutUs')}</Link></li>
             </ul>
