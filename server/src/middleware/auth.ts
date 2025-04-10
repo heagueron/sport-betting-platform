@@ -74,7 +74,7 @@ export const protect = async (
   }
 };
 
-// Middleware to restrict access to admin users only
+// Middleware to restrict access to specific roles
 export const restrictTo = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!roles.includes(req.user.role)) {
@@ -82,6 +82,20 @@ export const restrictTo = (roles: string[]) => {
         success: false,
         error: 'You do not have permission to perform this action'
       });
+    }
+    next();
+  };
+};
+
+// Middleware to authorize specific roles
+export const authorize = (...roles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (!roles.includes(req.user.role)) {
+      res.status(403).json({
+        success: false,
+        error: 'No tienes permiso para realizar esta acción'
+      });
+      return;
     }
     next();
   };

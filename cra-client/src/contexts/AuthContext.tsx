@@ -37,12 +37,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       const token = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
 
-      if (token) {
+      if (token && storedUser) {
         try {
-          const response = await authService.getCurrentUser();
-          setUser(response.data);
+          // Primero intentamos cargar el usuario desde localStorage
+          const parsedUser = JSON.parse(storedUser) as User;
+          setUser(parsedUser);
           setIsAuthenticated(true);
+
+          // Luego intentamos verificar con el servidor (pero no bloqueamos la carga)
+          try {
+            const response = await authService.getCurrentUser();
+            setUser(response.data);
+          } catch (apiError) {
+            // Si falla la verificación con el servidor pero tenemos un usuario en localStorage,
+            // mantenemos la sesión activa (para desarrollo)
+            console.warn('Could not verify user with server, using stored user data');
+          }
         } catch (error) {
           // Clear invalid token
           localStorage.removeItem('token');

@@ -9,6 +9,7 @@ import AboutPage from '../components/pages/About/AboutPage';
 import NotFoundPage from '../components/pages/NotFound/NotFoundPage';
 import ProfilePage from '../components/pages/Profile/ProfilePage';
 import AdminPage from '../components/pages/Admin/AdminPage';
+import UsersList from '../components/pages/Admin/Users/UsersList';
 import ProtectedRoute from '../components/auth/ProtectedRoute/ProtectedRoute';
 import AdminRoute from '../components/auth/AdminRoute/AdminRoute';
 import { useAuth } from '../contexts/AuthContext';
@@ -37,6 +38,11 @@ const AppRoutes: React.FC = () => {
       <Route path="/admin" element={
         <AdminRoute>
           <AdminPage />
+        </AdminRoute>
+      } />
+      <Route path="/admin/users" element={
+        <AdminRoute>
+          <UsersList />
         </AdminRoute>
       } />
 

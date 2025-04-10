@@ -1,0 +1,82 @@
+.users-list-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.users-list-header {
+  margin-bottom: 20px;
+}
+
+.users-list-header h1 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.users-list-table-container {
+  overflow-x: auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.users-list-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-list-table th,
+.users-list-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.users-list-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+.users-list-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.user-role {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.user-role.admin {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+}
+
+.user-role.user {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+}
+
+.view-user-button {
+  min-width: 100px;
+}
+
+.users-loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.users-error {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.1rem;
+  color: #d32f2f;
+  background-color: #ffebee;
+  border-radius: 8px;
+  margin-top: 20px;
+}
