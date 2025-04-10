@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
+import { useAuth } from '../../../contexts/AuthContext';
 import './MainLayout.css';
 
 interface MainLayoutProps {
@@ -18,10 +19,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   onSignup,
   onLogout,
 }) => {
+  const { user } = useAuth();
   return (
     <div className="main-layout">
       <Header
         isAuthenticated={isAuthenticated}
+        isAdmin={user?.role === 'ADMIN'}
         onLogin={onLogin}
         onSignup={onSignup}
         onLogout={onLogout}

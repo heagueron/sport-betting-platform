@@ -8,7 +8,9 @@ import EventDetailPage from '../components/pages/Events/EventDetailPage';
 import AboutPage from '../components/pages/About/AboutPage';
 import NotFoundPage from '../components/pages/NotFound/NotFoundPage';
 import ProfilePage from '../components/pages/Profile/ProfilePage';
+import AdminPage from '../components/pages/Admin/AdminPage';
 import ProtectedRoute from '../components/auth/ProtectedRoute/ProtectedRoute';
+import AdminRoute from '../components/auth/AdminRoute/AdminRoute';
 import { useAuth } from '../contexts/AuthContext';
 
 const AppRoutes: React.FC = () => {
@@ -29,6 +31,13 @@ const AppRoutes: React.FC = () => {
         <ProtectedRoute>
           <ProfilePage />
         </ProtectedRoute>
+      } />
+
+      {/* Admin Routes */}
+      <Route path="/admin" element={
+        <AdminRoute>
+          <AdminPage />
+        </AdminRoute>
       } />
 
       {/* Redirect to profile if already logged in */}
