@@ -7,7 +7,9 @@ import {
   getSport,
   getSportEvents,
   updateSport,
-  deleteSport
+  deleteSport,
+  activateSport,
+  deactivateSport
 } from '../controllers/sport';
 import {
   createSportSchema,
@@ -55,6 +57,20 @@ router.delete('/:id',
   restrictTo(['ADMIN']) as any,
   validate(deleteSportSchema),
   deleteSport as any
+);
+
+// Activar un deporte
+router.put('/:id/activate',
+  protect as any,
+  restrictTo(['ADMIN']) as any,
+  activateSport as any
+);
+
+// Desactivar un deporte
+router.put('/:id/deactivate',
+  protect as any,
+  restrictTo(['ADMIN']) as any,
+  deactivateSport as any
 );
 
 export default router;

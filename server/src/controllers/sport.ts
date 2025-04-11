@@ -241,3 +241,83 @@ export const deleteSport = async (
     next(error);
   }
 };
+
+// @desc    Activate sport
+// @route   PUT /api/sports/:id/activate
+// @access  Private/Admin
+export const activateSport = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const sportId = req.params.id;
+
+    // Check if sport exists
+    const sport = await getSportById(sportId);
+    if (!sport) {
+      return res.status(404).json({
+        success: false,
+        error: 'Sport not found'
+      });
+    }
+
+    // If already active, return as is
+    if (sport.active) {
+      return res.status(200).json({
+        success: true,
+        data: sport
+      });
+    }
+
+    // Update sport to active
+    const updatedSport = await updateSportById(sportId, { active: true });
+
+    res.status(200).json({
+      success: true,
+      data: updatedSport
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Deactivate sport
+// @route   PUT /api/sports/:id/deactivate
+// @access  Private/Admin
+export const deactivateSport = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const sportId = req.params.id;
+
+    // Check if sport exists
+    const sport = await getSportById(sportId);
+    if (!sport) {
+      return res.status(404).json({
+        success: false,
+        error: 'Sport not found'
+      });
+    }
+
+    // If already inactive, return as is
+    if (!sport.active) {
+      return res.status(200).json({
+        success: true,
+        data: sport
+      });
+    }
+
+    // Update sport to inactive
+    const updatedSport = await updateSportById(sportId, { active: false });
+
+    res.status(200).json({
+      success: true,
+      data: updatedSport
+    });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -2,6 +2,8 @@
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  /* Añadir margen superior para separar del header */
+  margin-top: 80px;
 }
 
 .users-list-header {
@@ -79,4 +81,11 @@
   background-color: #ffebee;
   border-radius: 8px;
   margin-top: 20px;
+}
+
+/* Estilo para el footer con botón de volver */
+.users-list-footer {
+  margin-top: 40px;
+  display: flex;
+  justify-content: flex-end;
 }

@@ -36,32 +36,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Check if user is already logged in on mount
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const token = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('user');
+      // Limpiar cualquier sesión anterior para evitar inicios de sesión automáticos
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
 
-      if (token && storedUser) {
-        try {
-          // Primero intentamos cargar el usuario desde localStorage
-          const parsedUser = JSON.parse(storedUser) as User;
-          setUser(parsedUser);
-          setIsAuthenticated(true);
-
-          // Luego intentamos verificar con el servidor (pero no bloqueamos la carga)
-          try {
-            const response = await authService.getCurrentUser();
-            setUser(response.data);
-          } catch (apiError) {
-            // Si falla la verificación con el servidor pero tenemos un usuario en localStorage,
-            // mantenemos la sesión activa (para desarrollo)
-            console.warn('Could not verify user with server, using stored user data');
-          }
-        } catch (error) {
-          // Clear invalid token
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-        }
-      }
-
+      setUser(null);
+      setIsAuthenticated(false);
       setIsLoading(false);
     };
 
@@ -69,11 +49,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (credentials: LoginData): Promise<void> => {
+    console.log('AuthContext: login called with credentials:', credentials);
     setIsLoading(true);
     setError(null);
 
     try {
+      console.log('AuthContext: calling authService.login');
       const response = await authService.login(credentials);
+      console.log('AuthContext: login response received:', response);
 
       // Save token and user data
       localStorage.setItem('token', response.token);
@@ -81,11 +64,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       setUser(response.data);
       setIsAuthenticated(true);
+      console.log('AuthContext: user authenticated successfully');
     } catch (error: any) {
+      console.error('AuthContext: login error:', error);
       setError(error.response?.data?.error || 'Failed to login');
       throw error;
     } finally {
       setIsLoading(false);
+      console.log('AuthContext: login process completed');
     }
   };
 

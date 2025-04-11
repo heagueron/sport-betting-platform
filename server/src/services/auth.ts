@@ -32,6 +32,8 @@ export const registerUser = async (userData: RegisterData): Promise<User> => {
  * @returns User if login successful
  */
 export const loginUser = async (credentials: LoginCredentials): Promise<User | null> => {
+  console.log('Service: loginUser called with email:', credentials.email);
+
   // Find user by email
   const user = await prisma.user.findUnique({
     where: { email: credentials.email },
@@ -39,16 +41,21 @@ export const loginUser = async (credentials: LoginCredentials): Promise<User | n
 
   // Check if user exists
   if (!user) {
+    console.log('Service: user not found with email:', credentials.email);
     return null;
   }
+
+  console.log('Service: user found with email:', credentials.email);
 
   // Check if password matches
   const isMatch = await bcrypt.compare(credentials.password, user.password);
 
   if (!isMatch) {
+    console.log('Service: password does not match for user:', credentials.email);
     return null;
   }
 
+  console.log('Service: password matches for user:', credentials.email);
   return user;
 };
 

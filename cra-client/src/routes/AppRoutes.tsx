@@ -11,6 +11,8 @@ import ProfilePage from '../components/pages/Profile/ProfilePage';
 import AdminPage from '../components/pages/Admin/AdminPage';
 import UsersList from '../components/pages/Admin/Users/UsersList';
 import UserDetail from '../components/pages/Admin/Users/UserDetail';
+import SportsList from '../components/pages/Admin/Sports/SportsList';
+import SportDetail from '../components/pages/Admin/Sports/SportDetail';
 import ProtectedRoute from '../components/auth/ProtectedRoute/ProtectedRoute';
 import AdminRoute from '../components/auth/AdminRoute/AdminRoute';
 import { useAuth } from '../contexts/AuthContext';
@@ -49,6 +51,17 @@ const AppRoutes: React.FC = () => {
       <Route path="/admin/users/:userId" element={
         <AdminRoute>
           <UserDetail />
+        </AdminRoute>
+      } />
+
+      <Route path="/admin/sports" element={
+        <AdminRoute>
+          <SportsList />
+        </AdminRoute>
+      } />
+      <Route path="/admin/sports/:sportId" element={
+        <AdminRoute>
+          <SportDetail />
         </AdminRoute>
       } />
 

@@ -54,11 +54,18 @@ export const logger = {
 
   // Log HTTP requests
   http: (req: any, res: any, responseTime?: number) => {
-    const { method, url, ip } = req;
+    const { method, url, ip, body } = req;
     const statusCode = res.statusCode;
     const userAgent = req.headers['user-agent'] || '';
 
     const message = `${method} ${url} ${statusCode} - ${responseTime}ms - ${ip} - ${userAgent}`;
+
+    // Log request body for debugging (only in development)
+    if (process.env.NODE_ENV === 'development') {
+      if (method === 'POST' || method === 'PUT') {
+        console.log('Request body:', JSON.stringify(body, null, 2));
+      }
+    }
 
     // Log with appropriate level based on status code
     if (statusCode >= 500) {

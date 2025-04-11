@@ -43,8 +43,15 @@ export const register = async (userData: RegisterData): Promise<AuthResponse> =>
  * @returns Promise with auth response
  */
 export const login = async (credentials: LoginData): Promise<AuthResponse> => {
-  const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
-  return response.data;
+  console.log('Sending login request with credentials:', credentials);
+  try {
+    const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
+    console.log('Login response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
 };
 
 /**

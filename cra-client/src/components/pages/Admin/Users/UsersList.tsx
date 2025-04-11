@@ -43,11 +43,18 @@ const UsersList: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="users-loading">Cargando usuarios...</div>;
+    return <div className="users-list-container"><div className="users-loading">Cargando usuarios...</div></div>;
   }
 
   if (error) {
-    return <div className="users-error">Error: {error}</div>;
+    return (
+      <div className="users-list-container">
+        <div className="users-error">Error: {error}</div>
+        <div className="users-list-footer">
+          <Button onClick={() => navigate('/admin')}>Volver al Panel</Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -93,6 +100,14 @@ const UsersList: React.FC = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="users-list-footer">
+        <Button
+          onClick={() => navigate('/admin')}
+        >
+          Volver al Panel
+        </Button>
       </div>
     </div>
   );
