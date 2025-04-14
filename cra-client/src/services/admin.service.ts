@@ -34,6 +34,38 @@ export interface SportResponse {
   data: Sport;
 }
 
+// Interfaces para la gestión de eventos
+export interface Participant {
+  name: string;
+  odds: number;
+}
+
+export interface Event {
+  id: string;
+  name: string;
+  sportId: string;
+  sport?: Sport;
+  startTime: string;
+  endTime?: string;
+  status: string;
+  format?: 'HEAD_TO_HEAD' | 'MULTI_PARTICIPANT';
+  result?: string;
+  participants?: Participant[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EventListResponse {
+  success: boolean;
+  count: number;
+  data: Event[];
+}
+
+export interface EventResponse {
+  success: boolean;
+  data: Event;
+}
+
 
 // Servicio para la gestión desde el panel de administración
 const adminService = {
@@ -108,6 +140,31 @@ const adminService = {
   // Desactivar un deporte
   deactivateSport: async (sportId: string): Promise<SportResponse> => {
     const response = await apiClient.put<SportResponse>(`/sports/${sportId}/deactivate`, {});
+    return response.data;
+  },
+
+  // ===== EVENTOS =====
+  // Obtener todos los eventos
+  getEvents: async (params?: { sportId?: string; status?: string }): Promise<EventListResponse> => {
+    const response = await apiClient.get<EventListResponse>('/events', { params });
+    return response.data;
+  },
+
+  // Obtener un evento por su ID
+  getEventById: async (eventId: string): Promise<EventResponse> => {
+    const response = await apiClient.get<EventResponse>(`/events/${eventId}`);
+    return response.data;
+  },
+
+  // Crear un nuevo evento
+  createEvent: async (eventData: Partial<Event>): Promise<EventResponse> => {
+    const response = await apiClient.post<EventResponse>('/events', eventData);
+    return response.data;
+  },
+
+  // Actualizar un evento
+  updateEvent: async (eventId: string, eventData: Partial<Event>): Promise<EventResponse> => {
+    const response = await apiClient.put<EventResponse>(`/events/${eventId}`, eventData);
     return response.data;
   },
 };

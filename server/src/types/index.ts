@@ -1,5 +1,5 @@
 // Common types used across the application
-import { Role, EventStatus, BetStatus } from '@prisma/client';
+import { Role, EventStatus, EventFormat, BetStatus } from '@prisma/client';
 
 export interface ErrorResponse {
   success: boolean;
@@ -62,5 +62,6 @@ export interface EventData {
   startTime: Date;
   endTime?: Date;
   status?: EventStatus;
+  format?: EventFormat;
   participants: ParticipantData[];
 }

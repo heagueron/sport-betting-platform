@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { EventStatus } from '@prisma/client';
+import { EventStatus, EventFormat } from '@prisma/client';
 import {
   createEvent,
   getAllEvents,
@@ -22,13 +22,31 @@ export const createNewEvent = async (
   next: NextFunction
 ) => {
   try {
-    const { name, sportId, startTime, endTime, status, participants } = req.body;
+    const { name, sportId, startTime, endTime, status, format, participants } = req.body;
 
     // Validate input
-    if (!name || !sportId || !startTime || !participants || !Array.isArray(participants) || participants.length < 2) {
+    if (!name || !sportId || !startTime || !participants || !Array.isArray(participants)) {
       return res.status(400).json({
         success: false,
-        error: 'Please provide name, sportId, startTime, and at least 2 participants'
+        error: 'Please provide name, sportId, startTime, and participants'
+      });
+    }
+
+    // Validate format and participants count
+    if (format === 'HEAD_TO_HEAD' && participants.length !== 2) {
+      return res.status(400).json({
+        success: false,
+        error: 'HEAD_TO_HEAD events must have exactly 2 participants'
+      });
+    } else if (format === 'MULTI_PARTICIPANT' && participants.length < 3) {
+      return res.status(400).json({
+        success: false,
+        error: 'MULTI_PARTICIPANT events must have at least 3 participants'
+      });
+    } else if (!format && participants.length < 2) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please provide at least 2 participants'
       });
     }
 
@@ -58,6 +76,7 @@ export const createNewEvent = async (
       startTime: new Date(startTime),
       endTime: endTime ? new Date(endTime) : undefined,
       status: status as EventStatus | undefined,
+      format: format as EventFormat | undefined,
       participants
     });
 
@@ -157,10 +176,10 @@ export const updateEvent = async (
 ) => {
   try {
     const eventId = req.params.id;
-    const { name, sportId, startTime, endTime, status } = req.body;
+    const { name, sportId, startTime, endTime, status, result } = req.body;
 
     // Check if at least one field is provided
-    if (!name && !sportId && !startTime && !endTime && !status) {
+    if (!name && !sportId && !startTime && !endTime && !status && result === undefined) {
       return res.status(400).json({
         success: false,
         error: 'Please provide at least one field to update'
@@ -184,8 +203,23 @@ export const updateEvent = async (
     }
     if (startTime) updateData.startTime = new Date(startTime);
     if (endTime) updateData.endTime = new Date(endTime);
+    if (result !== undefined) updateData.result = result;
     if (status) {
       if (['SCHEDULED', 'LIVE', 'COMPLETED', 'CANCELLED'].includes(status)) {
+        // Si el estado es COMPLETED, verificar que exista un resultado
+        if (status === 'COMPLETED') {
+          // Obtener el evento actual para verificar si tiene resultado
+          const currentEvent = await getEventById(eventId);
+
+          // Verificar si el evento tiene un resultado o si se está proporcionando uno en esta actualización
+          if ((!currentEvent?.result || currentEvent.result.trim() === '') && (!req.body.result || req.body.result.trim() === '')) {
+            return res.status(400).json({
+              success: false,
+              error: 'No se puede marcar un evento como COMPLETED sin proporcionar un resultado'
+            });
+          }
+        }
+
         updateData.status = status as EventStatus;
       } else {
         return res.status(400).json({

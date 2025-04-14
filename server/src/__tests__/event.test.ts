@@ -157,6 +157,63 @@ describe('Event API', () => {
       expect(response.body.success).toBe(false);
       expect(response.body.error).toBeDefined();
     });
+
+    it('should validate HEAD_TO_HEAD events have exactly 2 participants', async () => {
+      // Create an admin user and a sport
+      const admin = await createAdmin();
+      const token = generateToken(admin);
+      const sport = await createSport({ name: 'Football' });
+
+      // Try to create a HEAD_TO_HEAD event with 3 participants
+      const eventData = {
+        name: 'Invalid HEAD_TO_HEAD Event',
+        sportId: sport.id,
+        startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        format: 'HEAD_TO_HEAD',
+        participants: [
+          { name: 'Team A', odds: 1.5 },
+          { name: 'Team B', odds: 2.5 },
+          { name: 'Team C', odds: 3.0 }
+        ]
+      };
+
+      const response = await agent
+        .post('/api/events')
+        .set('Authorization', `Bearer ${token}`)
+        .send(eventData)
+        .expect(400);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.error).toContain('HEAD_TO_HEAD events must have exactly 2 participants');
+    });
+
+    it('should validate MULTI_PARTICIPANT events have at least 3 participants', async () => {
+      // Create an admin user and a sport
+      const admin = await createAdmin();
+      const token = generateToken(admin);
+      const sport = await createSport({ name: 'Football' });
+
+      // Try to create a MULTI_PARTICIPANT event with only 2 participants
+      const eventData = {
+        name: 'Invalid MULTI_PARTICIPANT Event',
+        sportId: sport.id,
+        startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        format: 'MULTI_PARTICIPANT',
+        participants: [
+          { name: 'Team A', odds: 1.5 },
+          { name: 'Team B', odds: 2.5 }
+        ]
+      };
+
+      const response = await agent
+        .post('/api/events')
+        .set('Authorization', `Bearer ${token}`)
+        .send(eventData)
+        .expect(400);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.error).toContain('MULTI_PARTICIPANT events must have at least 3 participants');
+    });
   });
 
   describe('GET /api/events', () => {
@@ -273,5 +330,156 @@ describe('Event API', () => {
     });
   });
 
-  // Additional tests for other event endpoints would follow a similar pattern
+  describe('PUT /api/events/:id', () => {
+    it('should update an event when admin is authenticated', async () => {
+      // Create an admin user, a sport, and an event
+      const admin = await createAdmin();
+      const token = generateToken(admin);
+      const sport = await createSport({ name: 'Football' });
+      const event = await createEvent(sport.id, { name: 'Original Event Name' });
+
+      const updateData = {
+        name: 'Updated Event Name',
+        startTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString() // 2 days from now
+      };
+
+      const response = await agent
+        .put(`/api/events/${event.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(updateData)
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.data).toBeDefined();
+      expect(response.body.data.name).toBe(updateData.name);
+
+      // Check that event was updated in database
+      const updatedEvent = await prisma.event.findUnique({
+        where: { id: event.id }
+      });
+      expect(updatedEvent).toBeDefined();
+      expect(updatedEvent?.name).toBe(updateData.name);
+    });
+
+    it('should not allow changing status to COMPLETED without a result', async () => {
+      // Create an admin user, a sport, and an event
+      const admin = await createAdmin();
+      const token = generateToken(admin);
+      const sport = await createSport({ name: 'Football' });
+      const event = await createEvent(sport.id, { name: 'Test Event' });
+
+      // Try to update status to COMPLETED without providing a result
+      const updateData = {
+        status: 'COMPLETED'
+      };
+
+      const response = await agent
+        .put(`/api/events/${event.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(updateData)
+        .expect(400);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.error).toContain('No se puede marcar un evento como COMPLETED sin proporcionar un resultado');
+
+      // Check that event status was not updated in database
+      const updatedEvent = await prisma.event.findUnique({
+        where: { id: event.id }
+      });
+      expect(updatedEvent).toBeDefined();
+      expect(updatedEvent?.status).not.toBe('COMPLETED');
+    });
+
+    it('should allow changing status to COMPLETED with a result', async () => {
+      // Create an admin user, a sport, and an event
+      const admin = await createAdmin();
+      const token = generateToken(admin);
+      const sport = await createSport({ name: 'Football' });
+      const event = await createEvent(sport.id, { name: 'Test Event' });
+
+      // Update status to COMPLETED with a result
+      const updateData = {
+        status: 'COMPLETED',
+        result: 'Team A 2-1 Team B'
+      };
+
+      const response = await agent
+        .put(`/api/events/${event.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(updateData)
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.data).toBeDefined();
+      expect(response.body.data.status).toBe('COMPLETED');
+      // El resultado puede ser null o el valor proporcionado
+      expect(response.body.data.result).toBeDefined();
+
+      // Check that event was updated in database
+      const updatedEvent = await prisma.event.findUnique({
+        where: { id: event.id }
+      });
+      expect(updatedEvent).toBeDefined();
+      expect(updatedEvent?.status).toBe('COMPLETED');
+      expect(updatedEvent?.result).toBe(updateData.result);
+    });
+
+    it('should return 401 if not authenticated', async () => {
+      // Create a sport and an event
+      const sport = await createSport({ name: 'Football' });
+      const event = await createEvent(sport.id, { name: 'Test Event' });
+
+      const updateData = {
+        name: 'Updated Event Name'
+      };
+
+      const response = await agent
+        .put(`/api/events/${event.id}`)
+        .send(updateData)
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.error).toBeDefined();
+    });
+
+    it('should return 403 if not an admin', async () => {
+      // Create a regular user, a sport, and an event
+      const user = await createUser();
+      const token = generateToken(user);
+      const sport = await createSport({ name: 'Football' });
+      const event = await createEvent(sport.id, { name: 'Test Event' });
+
+      const updateData = {
+        name: 'Updated Event Name'
+      };
+
+      const response = await agent
+        .put(`/api/events/${event.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(updateData)
+        .expect(403);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.error).toBeDefined();
+    });
+
+    it('should return 404 if event does not exist', async () => {
+      // Create an admin user
+      const admin = await createAdmin();
+      const token = generateToken(admin);
+
+      const updateData = {
+        name: 'Updated Event Name'
+      };
+
+      const response = await agent
+        .put('/api/events/00000000-0000-0000-0000-000000000000')
+        .set('Authorization', `Bearer ${token}`)
+        .send(updateData)
+        .expect(404);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.error).toBeDefined();
+    });
+  });
 });

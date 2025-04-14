@@ -161,7 +161,9 @@ describe('UserDetail Component', () => {
     });
 
     // Verificar que se muestra el mensaje de éxito
-    expect(screen.getByText('Usuario actualizado correctamente')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Usuario actualizado correctamente')).toBeInTheDocument();
+    });
   });
 
   test('changes user role when clicking on role button', async () => {
@@ -201,7 +203,9 @@ describe('UserDetail Component', () => {
     });
 
     // Verificar que se muestra el mensaje de éxito
-    expect(screen.getByText('Rol actualizado a ADMIN')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Rol actualizado a ADMIN')).toBeInTheDocument();
+    });
   });
 
   test('activates user when clicking on activate button', async () => {
@@ -244,7 +248,9 @@ describe('UserDetail Component', () => {
     });
 
     // Verificar que se muestra el mensaje de éxito
-    expect(screen.getByText('Usuario activado correctamente')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Usuario activado correctamente')).toBeInTheDocument();
+    });
   });
 
   test('deactivates user when clicking on deactivate button', async () => {
@@ -284,6 +290,8 @@ describe('UserDetail Component', () => {
     });
 
     // Verificar que se muestra el mensaje de éxito
-    expect(screen.getByText('Usuario desactivado correctamente')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Usuario desactivado correctamente')).toBeInTheDocument();
+    });
   });
 });

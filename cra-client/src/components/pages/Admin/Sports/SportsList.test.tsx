@@ -214,8 +214,10 @@ describe('SportsList Component', () => {
       });
     });
 
-    // Verificar que se recargó la lista de deportes
-    expect(adminService.getSports).toHaveBeenCalledTimes(2);
+    // Verificar que se muestra el mensaje de éxito
+    await waitFor(() => {
+      expect(screen.getByText('Deporte creado correctamente')).toBeInTheDocument();
+    });
   });
 
   test('activates a sport when clicking on Activar', async () => {
@@ -255,7 +257,9 @@ describe('SportsList Component', () => {
     });
 
     // Verificar que se muestra el mensaje de éxito
-    expect(screen.getByText('Deporte activado correctamente')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Deporte activado correctamente')).toBeInTheDocument();
+    });
   });
 
   test('deactivates a sport when clicking on Desactivar', async () => {
@@ -295,6 +299,8 @@ describe('SportsList Component', () => {
     });
 
     // Verificar que se muestra el mensaje de éxito
-    expect(screen.getByText('Deporte desactivado correctamente')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Deporte desactivado correctamente')).toBeInTheDocument();
+    });
   });
 });

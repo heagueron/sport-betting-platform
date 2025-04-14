@@ -1,4 +1,4 @@
-import { Event, Participant, EventStatus } from '@prisma/client';
+import { Event, Participant, EventStatus, EventFormat } from '@prisma/client';
 import prisma from '../config/prisma';
 import { EventData, ParticipantData } from '../types';
 
@@ -18,12 +18,13 @@ export const createEvent = async (eventData: EventData): Promise<Event & { parti
         startTime: eventData.startTime,
         endTime: eventData.endTime,
         status: eventData.status || 'SCHEDULED',
+        format: eventData.format || 'HEAD_TO_HEAD',
       }
     });
 
     // Create participants
     const participants = await Promise.all(
-      eventData.participants.map(participant => 
+      eventData.participants.map(participant =>
         tx.participant.create({
           data: {
             name: participant.name,
@@ -56,21 +57,21 @@ export const getAllEvents = async (
 ): Promise<{ events: Event[]; total: number; page: number; pages: number }> => {
   // Build where clause
   const where: any = {};
-  
+
   if (status) {
     where.status = status;
   }
-  
+
   if (sportId) {
     where.sportId = sportId;
   }
-  
+
   // Calculate pagination
   const skip = (page - 1) * limit;
-  
+
   // Get total count
   const total = await prisma.event.count({ where });
-  
+
   // Get events
   const events = await prisma.event.findMany({
     where,
@@ -82,10 +83,10 @@ export const getAllEvents = async (
     skip,
     take: limit
   });
-  
+
   // Calculate total pages
   const pages = Math.ceil(total / limit);
-  
+
   return {
     events,
     total,
@@ -123,34 +124,39 @@ export const updateEventById = async (
   const event = await prisma.event.findUnique({
     where: { id: eventId }
   });
-  
+
   if (!event) {
     return null;
   }
-  
+
   // Prepare update data
   const data: any = {};
-  
+
   if (updateData.name) {
     data.name = updateData.name;
   }
-  
+
   if (updateData.startTime) {
     data.startTime = updateData.startTime;
   }
-  
+
   if (updateData.endTime) {
     data.endTime = updateData.endTime;
   }
-  
+
   if (updateData.status) {
     data.status = updateData.status;
   }
-  
+
   if (updateData.sportId) {
     data.sportId = updateData.sportId;
   }
-  
+
+  // Handle result field - it can be an empty string or null
+  if (updateData.result !== undefined) {
+    data.result = updateData.result;
+  }
+
   // Update event
   return prisma.event.update({
     where: { id: eventId },
@@ -174,23 +180,23 @@ export const updateEventStatus = async (
   const event = await prisma.event.findUnique({
     where: { id: eventId }
   });
-  
+
   if (!event) {
     return null;
   }
-  
+
   // Prepare update data
   const data: any = { status };
-  
+
   // If status is COMPLETED, set endTime and result
   if (status === 'COMPLETED') {
     data.endTime = new Date();
-    
+
     if (result) {
       data.result = result;
     }
   }
-  
+
   // Update event
   return prisma.event.update({
     where: { id: eventId },
@@ -212,30 +218,30 @@ export const deleteEventById = async (eventId: string): Promise<boolean> => {
         bets: true
       }
     });
-    
+
     if (!event) {
       return false;
     }
-    
+
     // Check if event has bets
     if (event.bets.length > 0) {
       // Don't delete event with bets
       return false;
     }
-    
+
     // Delete event and its participants in a transaction
     await prisma.$transaction(async (tx) => {
       // Delete participants
       await tx.participant.deleteMany({
         where: { eventId }
       });
-      
+
       // Delete event
       await tx.event.delete({
         where: { id: eventId }
       });
     });
-    
+
     return true;
   } catch (error) {
     console.error('Error deleting event:', error);
@@ -257,11 +263,11 @@ export const addParticipant = async (
   const event = await prisma.event.findUnique({
     where: { id: eventId }
   });
-  
+
   if (!event) {
     return null;
   }
-  
+
   // Create participant
   return prisma.participant.create({
     data: {
@@ -286,22 +292,22 @@ export const updateParticipant = async (
   const participant = await prisma.participant.findUnique({
     where: { id: participantId }
   });
-  
+
   if (!participant) {
     return null;
   }
-  
+
   // Prepare update data
   const data: any = {};
-  
+
   if (updateData.name) {
     data.name = updateData.name;
   }
-  
+
   if (updateData.odds !== undefined) {
     data.odds = updateData.odds;
   }
-  
+
   // Update participant
   return prisma.participant.update({
     where: { id: participantId },
@@ -327,22 +333,22 @@ export const removeParticipant = async (participantId: string): Promise<boolean>
         }
       }
     });
-    
+
     if (!participant) {
       return false;
     }
-    
+
     // Check if event has bets
     if (participant.event.bets.length > 0) {
       // Don't remove participant if event has bets
       return false;
     }
-    
+
     // Delete participant
     await prisma.participant.delete({
       where: { id: participantId }
     });
-    
+
     return true;
   } catch (error) {
     console.error('Error removing participant:', error);

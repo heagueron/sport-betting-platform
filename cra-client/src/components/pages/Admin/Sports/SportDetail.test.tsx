@@ -163,7 +163,9 @@ describe('SportDetail Component', () => {
     });
 
     // Verificar que se muestra el mensaje de éxito
-    expect(screen.getByText('Deporte actualizado correctamente')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Deporte actualizado correctamente')).toBeInTheDocument();
+    });
   });
 
   test('deactivates sport when clicking on Desactivar Deporte', async () => {
@@ -204,7 +206,9 @@ describe('SportDetail Component', () => {
     });
 
     // Verificar que se muestra el mensaje de éxito
-    expect(screen.getByText('Deporte desactivado correctamente')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Deporte desactivado correctamente')).toBeInTheDocument();
+    });
   });
 
   test('activates sport when clicking on Activar Deporte', async () => {
@@ -248,7 +252,9 @@ describe('SportDetail Component', () => {
     });
 
     // Verificar que se muestra el mensaje de éxito
-    expect(screen.getByText('Deporte activado correctamente')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Deporte activado correctamente')).toBeInTheDocument();
+    });
   });
 
   test('navigates back to sports list when clicking on Volver a la lista', async () => {
