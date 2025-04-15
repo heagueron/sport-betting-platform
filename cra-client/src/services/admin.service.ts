@@ -36,8 +36,10 @@ export interface SportResponse {
 
 // Interfaces para la gestión de eventos
 export interface Participant {
+  id?: string;
   name: string;
   odds: number;
+  eventId?: string;
 }
 
 export interface Event {
@@ -64,6 +66,35 @@ export interface EventListResponse {
 export interface EventResponse {
   success: boolean;
   data: Event;
+}
+
+// Interfaces para la gestión de mercados
+export interface Market {
+  id: string;
+  name: string;
+  eventId: string;
+  event?: Event;
+  status: 'OPEN' | 'SUSPENDED' | 'CLOSED' | 'SETTLED' | 'CANCELLED';
+  winningSelection?: string;
+  createdAt: string;
+  updatedAt: string;
+  settledAt?: string;
+}
+
+export interface MarketListResponse {
+  success: boolean;
+  data: Market[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
+export interface MarketResponse {
+  success: boolean;
+  data: Market;
 }
 
 
@@ -165,6 +196,67 @@ const adminService = {
   // Actualizar un evento
   updateEvent: async (eventId: string, eventData: Partial<Event>): Promise<EventResponse> => {
     const response = await apiClient.put<EventResponse>(`/events/${eventId}`, eventData);
+    return response.data;
+  },
+
+  // ===== MERCADOS =====
+  // Obtener todos los mercados
+  getMarkets: async (params?: {
+    eventId?: string;
+    status?: string;
+    page?: number;
+    limit?: number;
+    search?: string;
+  }): Promise<MarketListResponse> => {
+    const response = await apiClient.get<MarketListResponse>('/markets', { params });
+    return response.data;
+  },
+
+  // Obtener un mercado por su ID
+  getMarketById: async (marketId: string): Promise<MarketResponse> => {
+    const response = await apiClient.get<MarketResponse>(`/markets/${marketId}`);
+    return response.data;
+  },
+
+  // Crear un nuevo mercado
+  createMarket: async (marketData: Partial<Market>): Promise<MarketResponse> => {
+    const response = await apiClient.post<MarketResponse>('/markets', marketData);
+    return response.data;
+  },
+
+  // Actualizar un mercado
+  updateMarket: async (marketId: string, marketData: Partial<Market>): Promise<MarketResponse> => {
+    const response = await apiClient.put<MarketResponse>(`/markets/${marketId}`, marketData);
+    return response.data;
+  },
+
+  // Suspender un mercado
+  suspendMarket: async (marketId: string): Promise<MarketResponse> => {
+    const response = await apiClient.put<MarketResponse>(`/markets/${marketId}/suspend`, {});
+    return response.data;
+  },
+
+  // Reactivar un mercado
+  reopenMarket: async (marketId: string): Promise<MarketResponse> => {
+    const response = await apiClient.put<MarketResponse>(`/markets/${marketId}/reopen`, {});
+    return response.data;
+  },
+
+  // Cerrar un mercado
+  closeMarket: async (marketId: string): Promise<MarketResponse> => {
+    const response = await apiClient.put<MarketResponse>(`/markets/${marketId}/close`, {});
+    return response.data;
+  },
+
+  // Cancelar un mercado
+  cancelMarket: async (marketId: string): Promise<MarketResponse> => {
+    const response = await apiClient.put<MarketResponse>(`/markets/${marketId}/cancel`, {});
+    return response.data;
+  },
+
+  // Liquidar un mercado
+  settleMarket: async (marketId: string, winningSelection: string): Promise<MarketResponse> => {
+    const response = await apiClient.put<MarketResponse>(`/markets/${marketId}/settle`, { winningSelection });
     return response.data;
   },
 };

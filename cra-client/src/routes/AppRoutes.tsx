@@ -15,6 +15,9 @@ import SportsList from '../components/pages/Admin/Sports/SportsList';
 import SportDetail from '../components/pages/Admin/Sports/SportDetail';
 import EventsList from '../components/pages/Admin/Events/EventsList';
 import EventDetail from '../components/pages/Admin/Events/EventDetail';
+import MarketsList from '../components/pages/Admin/Markets/MarketsList';
+import MarketCreate from '../components/pages/Admin/Markets/MarketCreate';
+import MarketDetail from '../components/pages/Admin/Markets/MarketDetail';
 import ProtectedRoute from '../components/auth/ProtectedRoute/ProtectedRoute';
 import AdminRoute from '../components/auth/AdminRoute/AdminRoute';
 import { useAuth } from '../contexts/AuthContext';
@@ -75,6 +78,22 @@ const AppRoutes: React.FC = () => {
       <Route path="/admin/events/:eventId" element={
         <AdminRoute>
           <EventDetail />
+        </AdminRoute>
+      } />
+
+      <Route path="/admin/markets" element={
+        <AdminRoute>
+          <MarketsList />
+        </AdminRoute>
+      } />
+      <Route path="/admin/markets/create" element={
+        <AdminRoute>
+          <MarketCreate />
+        </AdminRoute>
+      } />
+      <Route path="/admin/markets/:marketId" element={
+        <AdminRoute>
+          <MarketDetail />
         </AdminRoute>
       } />
 

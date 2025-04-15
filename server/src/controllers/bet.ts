@@ -30,9 +30,14 @@ export const createBetController = catchAsync(
         return next(new AppError('Event not found', 404));
       }
 
+      // Get markets for this event
+      const markets = await prisma.market.findMany({
+        where: { eventId: event.id }
+      });
+
       // Use the first market of the event
-      if (event.markets && event.markets.length > 0) {
-        req.body.marketId = event.markets[0].id;
+      if (markets && markets.length > 0) {
+        req.body.marketId = markets[0].id;
       } else {
         // Create a default market for the event
         try {

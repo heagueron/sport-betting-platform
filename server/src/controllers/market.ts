@@ -30,8 +30,11 @@ export const getAllMarkets = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const page = req.query.page ? parseInt(req.query.page as string) : 1;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+    const eventId = req.query.eventId as string | undefined;
+    const status = req.query.status as string | undefined;
+    const search = req.query.search as string | undefined;
 
-    const { markets, total, pages } = await marketService.getAllMarkets(page, limit);
+    const { markets, total, pages } = await marketService.getAllMarkets(page, limit, eventId, status, search);
 
     res.status(200).json({
       success: true,

@@ -17,8 +17,8 @@ export const createEvent = async (eventData: EventData): Promise<Event & { parti
         sportId: eventData.sportId,
         startTime: eventData.startTime,
         endTime: eventData.endTime,
-        status: eventData.status || 'SCHEDULED',
-        format: eventData.format || 'HEAD_TO_HEAD',
+        status: eventData.status || 'SCHEDULED' as any,
+        format: eventData.format || 'HEAD_TO_HEAD' as any,
       }
     });
 

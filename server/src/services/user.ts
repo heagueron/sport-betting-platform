@@ -15,27 +15,27 @@ export const getAllUsers = async (
   limit: number = 10,
   search?: string
 ): Promise<{
-  users: User[];
+  users: any[];
   total: number;
   page: number;
   pages: number;
 }> => {
   // Build where clause
   const where: any = {};
-  
+
   if (search) {
     where.OR = [
       { name: { contains: search, mode: 'insensitive' } },
       { email: { contains: search, mode: 'insensitive' } }
     ];
   }
-  
+
   // Calculate pagination
   const skip = (page - 1) * limit;
-  
+
   // Get total count
   const total = await prisma.user.count({ where });
-  
+
   // Get users
   const users = await prisma.user.findMany({
     where,
@@ -58,10 +58,10 @@ export const getAllUsers = async (
     skip,
     take: limit
   });
-  
+
   // Calculate total pages
   const pages = Math.ceil(total / limit);
-  
+
   return {
     users,
     total,
@@ -144,17 +144,17 @@ export const updateUserBalance = async (
   const user = await prisma.user.findUnique({
     where: { id: userId }
   });
-  
+
   if (!user) {
     throw new Error('User not found');
   }
-  
+
   const newBalance = user.balance + amount;
-  
+
   if (newBalance < 0) {
     throw new Error('Insufficient balance');
   }
-  
+
   return prisma.user.update({
     where: { id: userId },
     data: { balance: newBalance }

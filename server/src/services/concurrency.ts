@@ -35,7 +35,7 @@ export const TRANSACTION_OPTIONS = {
  */
 export const acquireMarketLock = async (
   marketId: string,
-  tx?: PrismaClient
+  tx?: any
 ): Promise<any> => {
   const client = tx || prisma;
 
@@ -85,7 +85,7 @@ export const acquireMarketLock = async (
  */
 export const releaseMarketLock = async (
   marketId: string,
-  tx?: PrismaClient
+  tx?: any
 ): Promise<void> => {
   const client = tx || prisma;
 
@@ -157,7 +157,7 @@ export const withRetry = async <T>(
  */
 export const withMarketLock = async <T>(
   marketId: string,
-  operation: (tx: PrismaClient) => Promise<T>
+  operation: (tx: any) => Promise<T>
 ): Promise<T> => {
   return withRetry(async () => {
     return prisma.$transaction(async (tx) => {

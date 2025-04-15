@@ -38,20 +38,46 @@ export const createMarket = async (
  * Get all markets
  * @param page Page number
  * @param limit Items per page
+ * @param eventId Optional event ID to filter by
+ * @param status Optional status to filter by
+ * @param search Optional search term to filter by name
  * @returns List of markets with pagination info
  */
 export const getAllMarkets = async (
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  eventId?: string,
+  status?: string,
+  search?: string
 ): Promise<{ markets: Market[]; total: number; page: number; pages: number }> => {
   // Calculate pagination
   const skip = (page - 1) * limit;
 
+  // Build where clause
+  const where: any = {};
+  if (eventId) where.eventId = eventId;
+  if (status) where.status = status;
+
+  // Add search condition if provided
+  if (search) {
+    where.OR = [
+      { name: { contains: search, mode: 'insensitive' } },
+      {
+        event: {
+          name: { contains: search, mode: 'insensitive' }
+        }
+      }
+    ];
+  }
+
   // Get total count
-  const total = await prisma.market.count();
+  const total = await prisma.market.count({
+    where
+  });
 
   // Get markets
   const markets = await prisma.market.findMany({
+    where,
     include: {
       event: {
         include: {

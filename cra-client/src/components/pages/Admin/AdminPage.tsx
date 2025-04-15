@@ -1,12 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../common/Button/Button';
+import { getQueueStats, pauseProcessor, resumeProcessor } from '../../../services/queueService';
 import './AdminPage.css';
 
 const AdminPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [queuePaused, setQueuePaused] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Cargar el estado inicial del procesador
+  useEffect(() => {
+    const fetchQueueStatus = async () => {
+      try {
+        const response = await getQueueStats();
+        setQueuePaused(response.data.paused);
+      } catch (error) {
+        console.error('Error al obtener el estado de la cola:', error);
+      }
+    };
+
+    fetchQueueStatus();
+  }, []);
 
   // Verificar si el usuario es administrador
   if (user?.role !== 'ADMIN') {
@@ -73,6 +90,19 @@ const AdminPage: React.FC = () => {
         </div>
 
         <div className="admin-card">
+          <h2>Mercados</h2>
+          <p>Administra los mercados de apuestas.</p>
+          <div>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/admin/markets')}
+            >
+              Gestionar Mercados
+            </Button>
+          </div>
+        </div>
+
+        <div className="admin-card">
           <h2>Apuestas</h2>
           <p>Revisa y gestiona las apuestas realizadas.</p>
           <div>
@@ -83,6 +113,35 @@ const AdminPage: React.FC = () => {
               Gestionar Apuestas
             </Button>
           </div>
+        </div>
+      </div>
+
+      <div className="admin-card">
+        <h2>Procesador de Cola</h2>
+        <p>Controla el procesador de cola de apuestas.</p>
+        <div>
+          <Button
+            variant={queuePaused ? "primary" : "danger"}
+            onClick={async () => {
+              setLoading(true);
+              try {
+                if (queuePaused) {
+                  await resumeProcessor();
+                  setQueuePaused(false);
+                } else {
+                  await pauseProcessor();
+                  setQueuePaused(true);
+                }
+              } catch (error) {
+                console.error('Error al cambiar el estado del procesador:', error);
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={loading}
+          >
+            {loading ? 'Procesando...' : queuePaused ? 'Reanudar Procesador' : 'Pausar Procesador'}
+          </Button>
         </div>
       </div>
 

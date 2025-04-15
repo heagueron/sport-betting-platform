@@ -27,8 +27,8 @@ router.get('/:id', validate(getMarketByIdSchema), getMarketById);
 router.get('/:id/orderbook', validate(getOrderBookSchema), getOrderBook);
 
 // Protected routes (admin only)
-router.post('/', protect, restrictTo(['ADMIN']), validate(createMarketSchema), createMarket);
-router.put('/:id/status', protect, restrictTo(['ADMIN']), validate(updateMarketStatusSchema), updateMarketStatus);
-router.put('/:id/settle', protect, restrictTo(['ADMIN']), validate(settleMarketSchema), settleMarket);
+router.post('/', protect, restrictTo(['ADMIN']) as any, validate(createMarketSchema), createMarket);
+router.put('/:id/status', protect, restrictTo(['ADMIN']) as any, validate(updateMarketStatusSchema), updateMarketStatus);
+router.put('/:id/settle', protect, restrictTo(['ADMIN']) as any, validate(settleMarketSchema), settleMarket);
 
 export default router;

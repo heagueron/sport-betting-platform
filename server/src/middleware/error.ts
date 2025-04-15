@@ -19,7 +19,7 @@ interface ErrorResponseBody {
  * Global error handling middleware
  */
 export const errorHandler = (
-  err: Error,
+  err: any,
   req: Request,
   res: Response,
   next: NextFunction

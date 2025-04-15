@@ -18,11 +18,16 @@ const MAX_BETS_PER_CYCLE = 10;
 let isProcessorRunning = false;
 
 /**
+ * Flag para indicar si el procesador está pausado
+ */
+let isProcessorPaused = false;
+
+/**
  * Procesa la cola de apuestas pendientes
  */
 export const processQueue = async (): Promise<void> => {
-  if (isProcessorRunning) {
-    return; // Evitar ejecuciones simultáneas
+  if (isProcessorRunning || isProcessorPaused) {
+    return; // Evitar ejecuciones simultáneas o si está pausado
   }
 
   try {
@@ -72,7 +77,8 @@ export const processQueue = async (): Promise<void> => {
  */
 export const startQueueProcessor = (): NodeJS.Timeout => {
   console.log('Starting bet queue processor...');
-  
+  isProcessorPaused = false;
+
   // Iniciar el procesador de cola en un intervalo
   return setInterval(processQueue, QUEUE_PROCESSING_INTERVAL_MS);
 };
@@ -84,6 +90,29 @@ export const startQueueProcessor = (): NodeJS.Timeout => {
 export const stopQueueProcessor = (intervalId: NodeJS.Timeout): void => {
   console.log('Stopping bet queue processor...');
   clearInterval(intervalId);
+};
+
+/**
+ * Pausa el procesador de cola
+ */
+export const pauseQueueProcessor = (): void => {
+  console.log('Pausing bet queue processor...');
+  isProcessorPaused = true;
+};
+
+/**
+ * Reanuda el procesador de cola
+ */
+export const resumeQueueProcessor = (): void => {
+  console.log('Resuming bet queue processor...');
+  isProcessorPaused = false;
+};
+
+/**
+ * Obtiene el estado actual del procesador
+ */
+export const getProcessorStatus = (): { paused: boolean } => {
+  return { paused: isProcessorPaused };
 };
 
 /**
