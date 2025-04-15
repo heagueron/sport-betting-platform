@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import * as marketService from '../services/market';
 import { MarketStatus } from '@prisma/client';
 import { catchAsync } from '../utils/catchAsync';
-import { AppError } from '../utils/appError';
+import { AppError } from '../utils/errors';
+import { getMarketOrderBook } from '../services/betMatching';
 
 /**
  * Create a new market
@@ -147,8 +148,19 @@ export const settleMarket = catchAsync(
 export const getOrderBook = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const marketId = req.params.id;
+    const { selection } = req.query;
 
-    const orderBook = await marketService.getOrderBook(marketId);
+    // Check if market exists
+    const market = await marketService.getMarketById(marketId);
+    if (!market) {
+      return next(new AppError('Market not found', 404));
+    }
+
+    // Get order book
+    const orderBook = await getMarketOrderBook(
+      marketId,
+      selection ? String(selection) : undefined
+    );
 
     res.status(200).json({
       success: true,

@@ -1,6 +1,6 @@
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
-import { PrismaClient, User, Role, TransactionType, TransactionStatus } from '@prisma/client';
+import { PrismaClient, User, Role, TransactionType, TransactionStatus, Event, Market } from '@prisma/client';
 import app from '../app';
 import { prisma } from './setup';
 
@@ -271,4 +271,147 @@ export const createMultipleTransactions = async (userId: string, count: number, 
   return transactions;
 };
 
+/**
+ * Create a test user for bet matching tests
+ * @param email Email for the test user
+ * @returns Created user
+ */
+export const createTestUser = async (email: string): Promise<User> => {
+  // Check if user already exists
+  const existingUser = await prisma.user.findUnique({
+    where: { email }
+  });
 
+  if (existingUser) {
+    // Update user balance
+    return prisma.user.update({
+      where: { id: existingUser.id },
+      data: {
+        balance: 1000,
+        availableBalance: 1000,
+        reservedBalance: 0
+      }
+    });
+  }
+
+  // Create new user
+  return prisma.user.create({
+    data: {
+      email,
+      name: `Test User ${email}`,
+      password: '$2b$10$EpRnTzVlqHNP0.fUbXUwSOyuiXe/QLSUG6xNekdHgTGmrpHEfIoxm', // password123
+      role: 'USER',
+      balance: 1000,
+      availableBalance: 1000,
+      reservedBalance: 0
+    }
+  });
+};
+
+/**
+ * Login a test user and get JWT token
+ * @param email Email of the test user
+ * @returns JWT token
+ */
+export const loginTestUser = async (email: string): Promise<string> => {
+  const agent = request.agent(app);
+  const response = await agent
+    .post('/api/auth/login')
+    .send({
+      email,
+      password: 'password123'
+    });
+
+  // Extract the token from the cookie
+  const cookies = response.headers['set-cookie'];
+  if (!cookies || cookies.length === 0) {
+    throw new Error('No cookies returned from login');
+  }
+
+  // Find the token cookie
+  const tokenCookie = cookies.find((cookie: string) => cookie.startsWith('token='));
+  if (!tokenCookie) {
+    throw new Error('Token cookie not found');
+  }
+
+  // Extract the token value
+  const token = tokenCookie.split(';')[0].replace('token=', '');
+  return token;
+};
+
+/**
+ * Create a test event for bet matching tests
+ * @returns Created event
+ */
+export const createTestEvent = async (): Promise<Event> => {
+  // Create a sport first
+  const sport = await createSport();
+
+  // Create an event
+  const event = await prisma.event.create({
+    data: {
+      name: `Test Event ${Date.now()}`,
+      startTime: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
+      status: 'SCHEDULED',
+      format: 'HEAD_TO_HEAD',
+      sportId: sport.id,
+      participants: {
+        create: [
+          {
+            name: 'Team A',
+            odds: 2.0
+          },
+          {
+            name: 'Team B',
+            odds: 1.8
+          },
+          {
+            name: 'Team C',
+            odds: 3.0
+          },
+          {
+            name: 'Team D',
+            odds: 4.5
+          },
+          {
+            name: 'Team E',
+            odds: 6.0
+          }
+        ]
+      }
+    },
+    include: {
+      participants: true,
+      sport: true
+    }
+  });
+
+  console.log('Created test event with participants:',
+    event.id,
+    event.participants.map(p => p.name).join(', ')
+  );
+
+  return event;
+};
+
+/**
+ * Create a test market for bet matching tests
+ * @param eventId Event ID
+ * @returns Created market
+ */
+export const createTestMarket = async (eventId: string): Promise<Market> => {
+  const market = await prisma.market.create({
+    data: {
+      name: `Test Market ${Date.now()}`,
+      status: 'OPEN',
+      eventId
+    },
+    include: {
+      event: true
+    }
+  });
+
+  console.log('Created test market:', market.id, 'for event:', eventId);
+
+  return market;
+};

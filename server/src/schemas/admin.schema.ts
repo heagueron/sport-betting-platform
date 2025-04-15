@@ -1,5 +1,21 @@
 import { z } from 'zod';
-import { Role, TransactionStatus, TransactionType } from '@prisma/client';
+import { Role } from '@prisma/client';
+
+// Define TransactionStatus enum to match the Prisma schema
+enum TransactionStatus {
+  PENDING = 'PENDING',
+  APROBADA = 'APROBADA',
+  COMPLETADA = 'COMPLETADA',
+  FALLIDA = 'FALLIDA'
+}
+
+// Define TransactionType enum to match the Prisma schema
+enum TransactionType {
+  DEPOSIT = 'DEPOSIT',
+  WITHDRAWAL = 'WITHDRAWAL',
+  BET = 'BET',
+  WINNING = 'WINNING'
+}
 
 // User schemas
 export const updateUserSchema = z.object({
