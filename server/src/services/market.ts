@@ -1,0 +1,422 @@
+import { Market, MarketStatus } from '@prisma/client';
+import prisma from '../config/prisma';
+import { MarketData } from '../types';
+
+/**
+ * Create a new market for an event
+ * @param eventId Event ID
+ * @param marketData Market data
+ * @returns Newly created market
+ */
+export const createMarket = async (
+  eventId: string,
+  marketData: MarketData
+): Promise<Market> => {
+  // Check if event exists
+  const event = await prisma.event.findUnique({
+    where: { id: eventId }
+  });
+
+  if (!event) {
+    throw new Error('Event not found');
+  }
+
+  // Create market
+  const market = await prisma.market.create({
+    data: {
+      name: marketData.name,
+      status: marketData.status || MarketStatus.OPEN,
+      eventId
+    }
+  });
+
+  return market;
+};
+
+/**
+ * Get all markets
+ * @param page Page number
+ * @param limit Items per page
+ * @returns List of markets with pagination info
+ */
+export const getAllMarkets = async (
+  page: number = 1,
+  limit: number = 10
+): Promise<{ markets: Market[]; total: number; page: number; pages: number }> => {
+  // Calculate pagination
+  const skip = (page - 1) * limit;
+
+  // Get total count
+  const total = await prisma.market.count();
+
+  // Get markets
+  const markets = await prisma.market.findMany({
+    include: {
+      event: {
+        include: {
+          sport: true
+        }
+      }
+    },
+    orderBy: { createdAt: 'desc' },
+    skip,
+    take: limit
+  });
+
+  // Calculate total pages
+  const pages = Math.ceil(total / limit);
+
+  return {
+    markets,
+    total,
+    page,
+    pages
+  };
+};
+
+/**
+ * Get markets by event ID
+ * @param eventId Event ID
+ * @param page Page number
+ * @param limit Items per page
+ * @returns List of markets with pagination info
+ */
+export const getMarketsByEvent = async (
+  eventId: string,
+  page: number = 1,
+  limit: number = 10
+): Promise<{ markets: Market[]; total: number; page: number; pages: number }> => {
+  // Calculate pagination
+  const skip = (page - 1) * limit;
+
+  // Get total count
+  const total = await prisma.market.count({
+    where: { eventId }
+  });
+
+  // Get markets
+  const markets = await prisma.market.findMany({
+    where: { eventId },
+    include: {
+      event: {
+        include: {
+          sport: true
+        }
+      },
+      bets: {
+        select: {
+          id: true,
+          amount: true,
+          odds: true,
+          type: true,
+          status: true,
+          matchedAmount: true
+        }
+      }
+    },
+    orderBy: { createdAt: 'desc' },
+    skip,
+    take: limit
+  });
+
+  // Calculate total pages
+  const pages = Math.ceil(total / limit);
+
+  return {
+    markets,
+    total,
+    page,
+    pages
+  };
+};
+
+/**
+ * Get market by ID
+ * @param marketId Market ID
+ * @returns Market if found
+ */
+export const getMarketById = async (marketId: string): Promise<Market | null> => {
+  return prisma.market.findUnique({
+    where: { id: marketId },
+    include: {
+      event: {
+        include: {
+          sport: true,
+          participants: true
+        }
+      },
+      bets: {
+        select: {
+          id: true,
+          amount: true,
+          odds: true,
+          selection: true,
+          type: true,
+          status: true,
+          matchedAmount: true,
+          user: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        }
+      }
+    }
+  });
+};
+
+/**
+ * Update market status
+ * @param marketId Market ID
+ * @param status New status
+ * @returns Updated market
+ */
+export const updateMarketStatus = async (
+  marketId: string,
+  status: MarketStatus
+): Promise<Market> => {
+  // Check if market exists
+  const market = await prisma.market.findUnique({
+    where: { id: marketId }
+  });
+
+  if (!market) {
+    throw new Error('Market not found');
+  }
+
+  // Update market status
+  return prisma.market.update({
+    where: { id: marketId },
+    data: { status }
+  });
+};
+
+/**
+ * Settle a market with a winning selection
+ * @param marketId Market ID
+ * @param winningSelection Winning selection
+ * @returns Number of bets settled
+ */
+export const settleMarket = async (
+  marketId: string,
+  winningSelection: string
+): Promise<number> => {
+  // Check if market exists
+  const market = await prisma.market.findUnique({
+    where: { id: marketId },
+    include: {
+      event: true,
+      bets: {
+        include: {
+          user: true,
+          asBackBet: {
+            include: {
+              layBet: true
+            }
+          },
+          asLayBet: {
+            include: {
+              backBet: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  if (!market) {
+    throw new Error('Market not found');
+  }
+
+  // Check if market is already settled
+  if (market.status === MarketStatus.SETTLED) {
+    throw new Error('Market is already settled');
+  }
+
+  // Check if event is completed
+  if (market.event.status !== 'COMPLETED') {
+    throw new Error('Event must be completed before settling market');
+  }
+
+  // Get all matched bets for this market
+  const matchedBets = market.bets.filter(
+    bet => bet.status === 'FULLY_MATCHED' || bet.status === 'PARTIALLY_MATCHED'
+  );
+
+  if (matchedBets.length === 0) {
+    // Update market status to settled
+    await prisma.market.update({
+      where: { id: marketId },
+      data: { status: MarketStatus.SETTLED }
+    });
+    return 0;
+  }
+
+  // Settle bets in a transaction
+  let settledCount = 0;
+  await prisma.$transaction(async (tx) => {
+    for (const bet of matchedBets) {
+      // Determine bet result
+      let result;
+      let winnings = 0;
+
+      if (bet.type === 'BACK') {
+        // Back bet wins if selection matches winning selection
+        if (bet.selection === winningSelection) {
+          result = 'WON';
+          winnings = bet.matchedAmount * bet.odds;
+        } else {
+          result = 'LOST';
+        }
+      } else {
+        // Lay bet wins if selection doesn't match winning selection
+        if (bet.selection !== winningSelection) {
+          result = 'WON';
+          winnings = bet.matchedAmount;
+        } else {
+          result = 'LOST';
+        }
+      }
+
+      // Update bet status
+      await tx.bet.update({
+        where: { id: bet.id },
+        data: { 
+          status: result === 'WON' ? 'WON' : 'LOST',
+          settledAt: new Date()
+        }
+      });
+
+      // Update user balance if bet won
+      if (result === 'WON') {
+        await tx.user.update({
+          where: { id: bet.userId },
+          data: { 
+            balance: bet.user.balance + winnings,
+            availableBalance: bet.user.availableBalance + winnings
+          }
+        });
+      }
+
+      // Release reserved balance for lay bets
+      if (bet.type === 'LAY' && bet.liability) {
+        await tx.user.update({
+          where: { id: bet.userId },
+          data: { 
+            reservedBalance: bet.user.reservedBalance - bet.liability
+          }
+        });
+      }
+
+      settledCount++;
+    }
+
+    // Update market status to settled
+    await tx.market.update({
+      where: { id: marketId },
+      data: { status: MarketStatus.SETTLED }
+    });
+  });
+
+  return settledCount;
+};
+
+/**
+ * Get order book for a market
+ * @param marketId Market ID
+ * @returns Order book with back and lay bets
+ */
+export const getOrderBook = async (marketId: string): Promise<{
+  selections: Record<string, {
+    backBets: { odds: number, amount: number }[],
+    layBets: { odds: number, amount: number }[]
+  }>
+}> => {
+  // Check if market exists
+  const market = await prisma.market.findUnique({
+    where: { id: marketId },
+    include: {
+      event: {
+        include: {
+          participants: true
+        }
+      },
+      bets: {
+        where: {
+          status: 'UNMATCHED'
+        }
+      }
+    }
+  });
+
+  if (!market) {
+    throw new Error('Market not found');
+  }
+
+  // Initialize order book
+  const orderBook: Record<string, {
+    backBets: { odds: number, amount: number }[],
+    layBets: { odds: number, amount: number }[]
+  }> = {};
+
+  // Initialize selections from participants
+  for (const participant of market.event.participants) {
+    orderBook[participant.name] = {
+      backBets: [],
+      layBets: []
+    };
+  }
+
+  // Group bets by selection and type
+  for (const bet of market.bets) {
+    if (!orderBook[bet.selection]) {
+      orderBook[bet.selection] = {
+        backBets: [],
+        layBets: []
+      };
+    }
+
+    const unmatchedAmount = bet.amount - bet.matchedAmount;
+    if (unmatchedAmount <= 0) continue;
+
+    if (bet.type === 'BACK') {
+      // Add to back bets
+      orderBook[bet.selection].backBets.push({
+        odds: bet.odds,
+        amount: unmatchedAmount
+      });
+    } else {
+      // Add to lay bets
+      orderBook[bet.selection].layBets.push({
+        odds: bet.odds,
+        amount: unmatchedAmount
+      });
+    }
+  }
+
+  // Aggregate and sort bets by odds
+  for (const selection in orderBook) {
+    // Aggregate back bets by odds (best odds first - highest)
+    const backBetsMap = new Map<number, number>();
+    for (const bet of orderBook[selection].backBets) {
+      const currentAmount = backBetsMap.get(bet.odds) || 0;
+      backBetsMap.set(bet.odds, currentAmount + bet.amount);
+    }
+    orderBook[selection].backBets = Array.from(backBetsMap.entries())
+      .map(([odds, amount]) => ({ odds, amount }))
+      .sort((a, b) => b.odds - a.odds);
+
+    // Aggregate lay bets by odds (best odds first - lowest)
+    const layBetsMap = new Map<number, number>();
+    for (const bet of orderBook[selection].layBets) {
+      const currentAmount = layBetsMap.get(bet.odds) || 0;
+      layBetsMap.set(bet.odds, currentAmount + bet.amount);
+    }
+    orderBook[selection].layBets = Array.from(layBetsMap.entries())
+      .map(([odds, amount]) => ({ odds, amount }))
+      .sort((a, b) => a.odds - b.odds);
+  }
+
+  return { selections: orderBook };
+};

@@ -3,6 +3,7 @@ import prisma from '../config/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { RegisterData, LoginCredentials } from '../types';
+import { AppError, ConflictError } from '../utils/errors';
 
 /**
  * Register a new user
@@ -10,20 +11,37 @@ import { RegisterData, LoginCredentials } from '../types';
  * @returns Newly created user
  */
 export const registerUser = async (userData: RegisterData): Promise<User> => {
-  // Hash password
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(userData.password, salt);
+  try {
+    // Check if user with this email already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email: userData.email }
+    });
 
-  // Create user
-  const user = await prisma.user.create({
-    data: {
-      name: userData.name,
-      email: userData.email,
-      password: hashedPassword,
-    },
-  });
+    if (existingUser) {
+      throw new ConflictError('Email already in use');
+    }
 
-  return user;
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(userData.password, salt);
+
+    // Create user
+    const user = await prisma.user.create({
+      data: {
+        name: userData.name,
+        email: userData.email,
+        password: hashedPassword,
+      },
+    });
+
+    return user;
+  } catch (error: any) {
+    // Handle Prisma unique constraint error
+    if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+      throw new ConflictError('Email already in use');
+    }
+    throw error;
+  }
 };
 
 /**
@@ -90,14 +108,33 @@ export const generateToken = (userId: string): string => {
  * @returns Updated user
  */
 export const updateUserDetails = async (userId: string, userData: { name?: string; email?: string }): Promise<User> => {
-  // Update user
-  const user = await prisma.user.update({
-    where: { id: userId },
-    data: {
-      name: userData.name,
-      email: userData.email,
-    },
-  });
+  try {
+    // Check if email is already in use by another user
+    if (userData.email) {
+      const existingUser = await prisma.user.findUnique({
+        where: { email: userData.email }
+      });
 
-  return user;
+      if (existingUser && existingUser.id !== userId) {
+        throw new ConflictError('Email already in use');
+      }
+    }
+
+    // Update user
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: userData.name,
+        email: userData.email,
+      },
+    });
+
+    return user;
+  } catch (error: any) {
+    // Handle Prisma unique constraint error
+    if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+      throw new ConflictError('Email already in use');
+    }
+    throw error;
+  }
 };

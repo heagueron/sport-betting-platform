@@ -1,5 +1,5 @@
 // Common types used across the application
-import { Role, EventStatus, EventFormat, BetStatus } from '@prisma/client';
+import { Role, EventStatus, EventFormat, BetStatus, BetType, MarketStatus } from '@prisma/client';
 
 export interface ErrorResponse {
   success: boolean;
@@ -41,9 +41,16 @@ export interface UpdateUserData {
 
 export interface BetData {
   eventId: string;
+  marketId: string;
   amount: number;
   odds: number;
   selection: string;
+  type?: BetType;
+}
+
+export interface MarketData {
+  name: string;
+  status?: MarketStatus;
 }
 
 export interface SportData {

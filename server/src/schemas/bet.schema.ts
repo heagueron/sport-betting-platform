@@ -1,12 +1,32 @@
 import { z } from 'zod';
+import { BetType } from '@prisma/client';
 
-// Schema for creating a bet
-export const createBetSchema = z.object({
+// Schema for creating a back bet
+export const createBackBetSchema = z.object({
   body: z.object({
     eventId: z.string().uuid('Invalid event ID format'),
+    marketId: z.string().uuid('Invalid market ID format').optional(),
     amount: z.number().positive('Bet amount must be a positive number'),
     odds: z.number().gt(1, 'Odds must be greater than 1'),
     selection: z.string().min(1, 'Selection is required'),
+  }),
+});
+
+// Schema for creating a lay bet
+export const createLayBetSchema = z.object({
+  body: z.object({
+    eventId: z.string().uuid('Invalid event ID format'),
+    marketId: z.string().uuid('Invalid market ID format'),
+    amount: z.number().positive('Bet amount must be a positive number'),
+    odds: z.number().gt(1, 'Odds must be greater than 1'),
+    selection: z.string().min(1, 'Selection is required'),
+  }),
+});
+
+// Schema for cancelling a bet
+export const cancelBetSchema = z.object({
+  params: z.object({
+    id: z.string().uuid('Invalid bet ID format'),
   }),
 });
 
@@ -33,23 +53,10 @@ export const getBetSchema = z.object({
   }),
 });
 
-// Schema for settling a bet
-export const settleBetSchema = z.object({
+// Schema for getting bet matches
+export const getBetMatchesSchema = z.object({
   params: z.object({
     id: z.string().uuid('Invalid bet ID format'),
-  }),
-  body: z.object({
-    status: z.enum(['WON', 'LOST', 'CANCELLED']),
-  }),
-});
-
-// Schema for settling event bets
-export const settleEventBetsSchema = z.object({
-  params: z.object({
-    id: z.string().uuid('Invalid event ID format'),
-  }),
-  body: z.object({
-    winningSelection: z.string().min(1, 'Winning selection is required'),
   }),
 });
 

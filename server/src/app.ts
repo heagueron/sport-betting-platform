@@ -10,6 +10,7 @@ import userRoutes from './routes/user';
 import betRoutes from './routes/bet';
 import sportRoutes from './routes/sport';
 import eventRoutes from './routes/event';
+import marketRoutes from './routes/market';
 
 // Import middleware
 import { errorHandler } from './middleware/error';
@@ -42,6 +43,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/bets', betRoutes);
 app.use('/api/sports', sportRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/markets', marketRoutes);
 
 // Health check route
 app.get('/health', (_req, res) => {

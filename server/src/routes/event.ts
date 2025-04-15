@@ -12,6 +12,7 @@ import {
   updateEventParticipant,
   removeEventParticipant
 } from '../controllers/event';
+import { getMarketsByEvent } from '../controllers/market';
 import {
   createEventSchema,
   getEventsSchema,
@@ -23,6 +24,7 @@ import {
   updateParticipantSchema,
   removeParticipantSchema
 } from '../schemas/event.schema';
+import { getMarketsByEventSchema } from '../schemas/market';
 
 const router = express.Router();
 
@@ -63,6 +65,12 @@ router.delete('/:id',
   restrictTo(['ADMIN']) as any,
   validate(deleteEventSchema),
   deleteEvent as any
+);
+
+// Market routes
+router.get('/:id/markets',
+  validate(getMarketsByEventSchema),
+  getMarketsByEvent as any
 );
 
 // Participant routes

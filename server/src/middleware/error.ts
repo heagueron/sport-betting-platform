@@ -48,6 +48,22 @@ export const errorHandler = (
       errorResponse.errors = err.errors;
     }
   }
+  // Handle regular Error with specific messages
+  else if (err instanceof Error) {
+    // Check for common error messages and assign appropriate status codes
+    if (err.message.includes('Insufficient balance')) {
+      errorResponse.error = err.message;
+      errorResponse.statusCode = 400;
+    } else if (err.message.includes('not found')) {
+      errorResponse.error = err.message;
+      errorResponse.statusCode = 404;
+    } else if (err.message.includes('Unauthorized')) {
+      errorResponse.error = err.message;
+      errorResponse.statusCode = 403;
+    } else {
+      errorResponse.error = err.message;
+    }
+  }
   // Handle Zod validation errors
   else if (err instanceof ZodError) {
     errorResponse.error = 'Validation error';

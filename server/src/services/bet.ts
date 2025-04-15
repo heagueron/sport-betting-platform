@@ -1,14 +1,16 @@
-import { Bet, BetStatus, User } from '@prisma/client';
+import { Bet, BetStatus, BetType, User } from '@prisma/client';
 import prisma from '../config/prisma';
 import { BetData } from '../types';
+import * as betMatchingService from './betMatching';
+import { AppError } from '../utils/appError';
 
 /**
- * Create a new bet
+ * Create a new back bet
  * @param userId User ID
  * @param betData Bet data
  * @returns Newly created bet
  */
-export const createNewBet = async (
+export const createBackBet = async (
   userId: string,
   betData: BetData
 ): Promise<Bet> => {
@@ -23,39 +25,53 @@ export const createNewBet = async (
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new AppError('User not found', 404);
     }
 
     // Check if user has enough balance
-    if (user.balance < betData.amount) {
-      throw new Error('Insufficient balance');
+    if (user.availableBalance < betData.amount) {
+      throw new AppError('Insufficient balance', 400);
     }
 
-    // Get event
-    const event = await tx.event.findUnique({
-      where: { id: betData.eventId },
-      include: { participants: true }
+    // Get market
+    const market = await tx.market.findUnique({
+      where: { id: betData.marketId },
+      include: {
+        event: {
+          include: {
+            participants: true
+          }
+        }
+      }
     });
 
-    if (!event) {
-      throw new Error('Event not found');
+    if (!market) {
+      throw new AppError('Market not found', 404);
+    }
+
+    // Check if market is open
+    if (market.status !== 'OPEN') {
+      throw new AppError('Market is not open for betting', 400);
     }
 
     // Check if event is accepting bets
-    if (event.status !== 'SCHEDULED' && event.status !== 'LIVE') {
-      throw new Error('Event is not accepting bets');
+    if (market.event.status !== 'SCHEDULED' && market.event.status !== 'LIVE') {
+      throw new AppError('Event is not accepting bets', 400);
     }
 
     // Check if selection is valid
-    const validSelection = event.participants.some(p => p.name === betData.selection);
+    const validSelection = market.event.participants.some(p => p.name === betData.selection);
     if (!validSelection) {
-      throw new Error('Invalid selection');
+      throw new AppError('Invalid selection', 400);
     }
 
     // Update user balance
     await tx.user.update({
       where: { id: userId },
-      data: { balance: user.balance - betData.amount }
+      data: {
+        balance: user.balance - betData.amount,
+        availableBalance: user.availableBalance - betData.amount
+      }
     });
 
     // Create bet
@@ -65,13 +81,214 @@ export const createNewBet = async (
         odds: betData.odds,
         selection: betData.selection,
         potentialWinnings,
+        type: BetType.BACK,
+        matchedAmount: 0,
         userId,
-        eventId: betData.eventId
+        eventId: betData.eventId,
+        marketId: betData.marketId
       }
     });
   });
 
-  return bet;
+  // Try to match the bet
+  try {
+    await betMatchingService.matchBet(bet.id);
+  } catch (error) {
+    console.error('Error matching bet:', error);
+  }
+
+  // Return the bet with fresh data after matching
+  return prisma.bet.findUnique({
+    where: { id: bet.id },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      event: true,
+      market: true
+    }
+  }) as Promise<Bet>;
+};
+
+/**
+ * Create a new lay bet
+ * @param userId User ID
+ * @param betData Bet data
+ * @returns Newly created bet
+ */
+export const createLayBet = async (
+  userId: string,
+  betData: BetData
+): Promise<Bet> => {
+  // Calculate liability (potential loss)
+  const liability = betData.amount * (betData.odds - 1);
+
+  // Create bet in a transaction to handle balance update
+  const bet = await prisma.$transaction(async (tx) => {
+    // Get user
+    const user = await tx.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    // Check if user has enough balance to cover liability
+    if (user.availableBalance < liability) {
+      throw new AppError('Insufficient balance to cover liability', 400);
+    }
+
+    // Get market
+    const market = await tx.market.findUnique({
+      where: { id: betData.marketId },
+      include: {
+        event: {
+          include: {
+            participants: true
+          }
+        }
+      }
+    });
+
+    if (!market) {
+      throw new AppError('Market not found', 404);
+    }
+
+    // Check if market is open
+    if (market.status !== 'OPEN') {
+      throw new AppError('Market is not open for betting', 400);
+    }
+
+    // Check if event is accepting bets
+    if (market.event.status !== 'SCHEDULED' && market.event.status !== 'LIVE') {
+      throw new AppError('Event is not accepting bets', 400);
+    }
+
+    // Check if selection is valid
+    const validSelection = market.event.participants.some(p => p.name === betData.selection);
+    if (!validSelection) {
+      throw new AppError('Invalid selection', 400);
+    }
+
+    // Update user balance - reserve the liability amount
+    await tx.user.update({
+      where: { id: userId },
+      data: {
+        availableBalance: user.availableBalance - liability,
+        reservedBalance: user.reservedBalance + liability
+      }
+    });
+
+    // Create bet
+    return tx.bet.create({
+      data: {
+        amount: betData.amount,
+        odds: betData.odds,
+        selection: betData.selection,
+        potentialWinnings: betData.amount, // For lay bets, potential winnings is the stake
+        liability,
+        matchedAmount: 0,
+        userId,
+        eventId: betData.eventId,
+        marketId: betData.marketId
+      }
+    });
+  });
+
+  // Try to match the bet
+  try {
+    await betMatchingService.matchBet(bet.id);
+  } catch (error) {
+    console.error('Error matching bet:', error);
+  }
+
+  // Return the bet with fresh data after matching
+  return prisma.bet.findUnique({
+    where: { id: bet.id },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      event: true,
+      market: true
+    }
+  }) as Promise<Bet>;
+};
+
+/**
+ * Cancel an unmatched bet
+ * @param betId Bet ID
+ * @param userId User ID (for authorization)
+ * @returns Cancelled bet
+ */
+export const cancelUnmatchedBet = async (
+  betId: string,
+  userId: string
+): Promise<Bet> => {
+  // Get the bet
+  const bet = await prisma.bet.findUnique({
+    where: { id: betId },
+    include: { user: true }
+  });
+
+  if (!bet) {
+    throw new AppError('Bet not found', 404);
+  }
+
+  // Check if user owns the bet
+  if (bet.userId !== userId) {
+    throw new AppError('Unauthorized', 403);
+  }
+
+  // Only allow cancelling unmatched or partially matched bets
+  if (bet.status !== BetStatus.UNMATCHED && bet.status !== BetStatus.PARTIALLY_MATCHED) {
+    throw new AppError('Bet cannot be cancelled', 400);
+  }
+
+  // Calculate refund amount
+  const refundAmount = bet.amount - bet.matchedAmount;
+
+  // Cancel bet in a transaction
+  return prisma.$transaction(async (tx) => {
+    // Update bet status
+    const updatedBet = await tx.bet.update({
+      where: { id: betId },
+      data: {
+        status: BetStatus.CANCELLED,
+        settledAt: new Date()
+      }
+    });
+
+    // Refund the unmatched amount
+    if (bet.type === BetType.BACK) {
+      await tx.user.update({
+        where: { id: bet.userId },
+        data: {
+          balance: bet.user.balance + refundAmount,
+          availableBalance: bet.user.availableBalance + refundAmount
+        }
+      });
+    } else if (bet.type === BetType.LAY && bet.liability) {
+      // For lay bets, release the reserved liability proportionally
+      const liabilityToRelease = bet.liability * (refundAmount / bet.amount);
+      await tx.user.update({
+        where: { id: bet.userId },
+        data: {
+          availableBalance: bet.user.availableBalance + liabilityToRelease,
+          reservedBalance: bet.user.reservedBalance - liabilityToRelease
+        }
+      });
+    }
+
+    return updatedBet;
+  });
 };
 
 /**
@@ -104,7 +321,8 @@ export const getAllBets = async (
         include: {
           sport: true
         }
-      }
+      },
+      market: true
     },
     orderBy: { createdAt: 'desc' },
     skip,
@@ -150,6 +368,41 @@ export const getUserBets = async (
         include: {
           sport: true
         }
+      },
+      market: true,
+      asBackBet: {
+        include: {
+          layBet: {
+            select: {
+              id: true,
+              odds: true,
+              amount: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          }
+        }
+      },
+      asLayBet: {
+        include: {
+          backBet: {
+            select: {
+              id: true,
+              odds: true,
+              amount: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          }
+        }
       }
     },
     orderBy: { createdAt: 'desc' },
@@ -189,119 +442,78 @@ export const getBetById = async (betId: string): Promise<Bet | null> => {
           sport: true,
           participants: true
         }
+      },
+      market: true,
+      asBackBet: {
+        include: {
+          layBet: {
+            select: {
+              id: true,
+              odds: true,
+              amount: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          }
+        }
+      },
+      asLayBet: {
+        include: {
+          backBet: {
+            select: {
+              id: true,
+              odds: true,
+              amount: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          }
+        }
       }
     }
   });
-};
-
-/**
- * Settle a bet
- * @param betId Bet ID
- * @param status New status
- * @returns Updated bet
- */
-export const settleBetById = async (
-  betId: string,
-  status: BetStatus
-): Promise<Bet | null> => {
-  // Only allow settling pending bets
-  const bet = await prisma.bet.findUnique({
-    where: { id: betId },
-    include: { user: true }
-  });
-
-  if (!bet || bet.status !== 'PENDING') {
-    return null;
-  }
-
-  // Update bet in a transaction to handle balance update for winning bets
-  return prisma.$transaction(async (tx) => {
-    // Update bet status
-    const updatedBet = await tx.bet.update({
-      where: { id: betId },
-      data: { status }
-    });
-
-    // If bet is won, update user balance
-    if (status === 'WON') {
-      await tx.user.update({
-        where: { id: bet.userId },
-        data: { balance: bet.user.balance + bet.potentialWinnings }
-      });
-    }
-    // If bet is cancelled, refund the bet amount
-    else if (status === 'CANCELLED') {
-      await tx.user.update({
-        where: { id: bet.userId },
-        data: { balance: bet.user.balance + bet.amount }
-      });
-    }
-
-    return updatedBet;
-  });
-};
-
-/**
- * Settle bets for an event
- * @param eventId Event ID
- * @param winningSelection Winning selection
- * @returns Number of bets settled
- */
-export const settleBetsForEvent = async (
-  eventId: string,
-  winningSelection: string
-): Promise<number> => {
-  // Get all pending bets for the event
-  const pendingBets = await prisma.bet.findMany({
-    where: {
-      eventId,
-      status: 'PENDING'
-    },
-    include: { user: true }
-  });
-
-  // No bets to settle
-  if (pendingBets.length === 0) {
-    return 0;
-  }
-
-  // Settle bets in a transaction
-  await prisma.$transaction(async (tx) => {
-    for (const bet of pendingBets) {
-      // Determine bet status
-      const status: BetStatus = bet.selection === winningSelection ? 'WON' : 'LOST';
-
-      // Update bet status
-      await tx.bet.update({
-        where: { id: bet.id },
-        data: { status }
-      });
-
-      // If bet is won, update user balance
-      if (status === 'WON') {
-        await tx.user.update({
-          where: { id: bet.userId },
-          data: { balance: bet.user.balance + bet.potentialWinnings }
-        });
-      }
-    }
-  });
-
-  return pendingBets.length;
 };
 
 /**
  * Get user balance
  * @param userId User ID
- * @returns User balance
+ * @returns User balance info
  */
-export const getUserBalance = async (userId: string): Promise<number> => {
+export const getUserBalance = async (userId: string): Promise<{
+  balance: number;
+  availableBalance: number;
+  reservedBalance: number;
+}> => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { balance: true }
+    select: {
+      balance: true,
+      availableBalance: true,
+      reservedBalance: true
+    }
   });
 
-  return user ? user.balance : 0;
+  if (!user) {
+    return {
+      balance: 0,
+      availableBalance: 0,
+      reservedBalance: 0
+    };
+  }
+
+  return {
+    balance: user.balance,
+    availableBalance: user.availableBalance,
+    reservedBalance: user.reservedBalance
+  };
 };
 
 /**
@@ -324,13 +536,16 @@ export const updateUserBalance = async (
   }
 
   // Check if user has enough balance for negative amounts
-  if (amount < 0 && user.balance + amount < 0) {
-    throw new Error('Insufficient balance');
+  if (amount < 0 && user.availableBalance + amount < 0) {
+    throw new AppError('Insufficient balance', 400);
   }
 
   // Update balance
   return prisma.user.update({
     where: { id: userId },
-    data: { balance: user.balance + amount }
+    data: {
+      balance: user.balance + amount,
+      availableBalance: user.availableBalance + amount
+    }
   });
 };
