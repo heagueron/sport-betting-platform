@@ -11,18 +11,20 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  balance   Float    @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(uuid())
+  name            String
+  email           String   @unique
+  password        String
+  role            Role     @default(USER)
+  balance         Float    @default(0)      // Mantener para compatibilidad
+  availableBalance Float    @default(0)      // Nuevo campo
+  reservedBalance  Float    @default(0)      // Nuevo campo
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  bets         Bet[]
-  transactions Transaction[]
-  adminLogs    AdminLog[]
+  bets            Bet[]
+  transactions    Transaction[]
+  adminLogs       AdminLog[]
 
   @@map("users")
 }
@@ -46,6 +48,7 @@ model Event {
   startTime   DateTime
   endTime     DateTime?
   status      EventStatus @default(SCHEDULED)
+  format      EventFormat @default(HEAD_TO_HEAD)
   result      String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -55,6 +58,7 @@ model Event {
 
   participants Participant[]
   bets         Bet[]
+  markets      Market[]    // Nueva relación
 
   @@map("events")
 }
@@ -72,23 +76,66 @@ model Participant {
   @@map("participants")
 }
 
+// Mercado de apuestas
+model Market {
+  id          String       @id @default(uuid())
+  name        String       // Ej: "Ganador del partido"
+  status      MarketStatus @default(OPEN)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  eventId     String
+  event       Event        @relation(fields: [eventId], references: [id])
+
+  bets        Bet[]
+
+  @@map("markets")
+}
+
 model Bet {
-  id               String   @id @default(uuid())
+  id               String    @id @default(uuid())
   amount           Float
   odds             Float
   selection        String
-  status           BetStatus @default(PENDING)
+  status           BetStatus @default(UNMATCHED)  // Cambiado de PENDING a UNMATCHED
   potentialWinnings Float
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  type             BetType   @default(BACK)       // Nuevo campo
+  liability        Float?                         // Nuevo campo para apuestas LAY
+  matchedAmount    Float     @default(0)          // Nuevo campo
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  settledAt        DateTime?
 
   userId           String
-  user             User     @relation(fields: [userId], references: [id])
+  user             User      @relation(fields: [userId], references: [id])
 
   eventId          String
-  event            Event    @relation(fields: [eventId], references: [id])
+  event            Event     @relation(fields: [eventId], references: [id])
+
+  marketId         String
+  market           Market    @relation(fields: [marketId], references: [id])
+
+  // Relaciones para emparejamiento
+  asBackBet        BetMatch[] @relation("BackBet")
+  asLayBet         BetMatch[] @relation("LayBet")
 
   @@map("bets")
+}
+
+// Emparejamientos entre apuestas
+model BetMatch {
+  id          String   @id @default(uuid())
+  amount      Float    // Monto emparejado
+  odds        Float    // Cuota del emparejamiento
+  createdAt   DateTime @default(now())
+
+  backBetId   String
+  backBet     Bet      @relation("BackBet", fields: [backBetId], references: [id])
+
+  layBetId    String
+  layBet      Bet      @relation("LayBet", fields: [layBetId], references: [id])
+
+  @@map("bet_matches")
 }
 
 enum Role {
@@ -103,10 +150,31 @@ enum EventStatus {
   CANCELLED
 }
 
+enum EventFormat {
+  HEAD_TO_HEAD
+  MULTI_PARTICIPANT
+}
+
 enum BetStatus {
-  PENDING
+  UNMATCHED         // Nueva opción (reemplaza PENDING)
+  PARTIALLY_MATCHED // Nueva opción
+  FULLY_MATCHED     // Nueva opción
   WON
   LOST
+  CANCELLED
+  VOID              // Nueva opción
+}
+
+enum BetType {
+  BACK
+  LAY
+}
+
+enum MarketStatus {
+  OPEN
+  SUSPENDED
+  CLOSED
+  SETTLED
   CANCELLED
 }
 

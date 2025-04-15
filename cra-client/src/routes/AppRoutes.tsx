@@ -8,7 +8,15 @@ import EventDetailPage from '../components/pages/Events/EventDetailPage';
 import AboutPage from '../components/pages/About/AboutPage';
 import NotFoundPage from '../components/pages/NotFound/NotFoundPage';
 import ProfilePage from '../components/pages/Profile/ProfilePage';
+import AdminPage from '../components/pages/Admin/AdminPage';
+import UsersList from '../components/pages/Admin/Users/UsersList';
+import UserDetail from '../components/pages/Admin/Users/UserDetail';
+import SportsList from '../components/pages/Admin/Sports/SportsList';
+import SportDetail from '../components/pages/Admin/Sports/SportDetail';
+import EventsList from '../components/pages/Admin/Events/EventsList';
+import EventDetail from '../components/pages/Admin/Events/EventDetail';
 import ProtectedRoute from '../components/auth/ProtectedRoute/ProtectedRoute';
+import AdminRoute from '../components/auth/AdminRoute/AdminRoute';
 import { useAuth } from '../contexts/AuthContext';
 
 const AppRoutes: React.FC = () => {
@@ -29,6 +37,45 @@ const AppRoutes: React.FC = () => {
         <ProtectedRoute>
           <ProfilePage />
         </ProtectedRoute>
+      } />
+
+      {/* Admin Routes */}
+      <Route path="/admin" element={
+        <AdminRoute>
+          <AdminPage />
+        </AdminRoute>
+      } />
+      <Route path="/admin/users" element={
+        <AdminRoute>
+          <UsersList />
+        </AdminRoute>
+      } />
+      <Route path="/admin/users/:userId" element={
+        <AdminRoute>
+          <UserDetail />
+        </AdminRoute>
+      } />
+
+      <Route path="/admin/sports" element={
+        <AdminRoute>
+          <SportsList />
+        </AdminRoute>
+      } />
+      <Route path="/admin/sports/:sportId" element={
+        <AdminRoute>
+          <SportDetail />
+        </AdminRoute>
+      } />
+
+      <Route path="/admin/events" element={
+        <AdminRoute>
+          <EventsList />
+        </AdminRoute>
+      } />
+      <Route path="/admin/events/:eventId" element={
+        <AdminRoute>
+          <EventDetail />
+        </AdminRoute>
       } />
 
       {/* Redirect to profile if already logged in */}

@@ -36,20 +36,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Check if user is already logged in on mount
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const token = localStorage.getItem('token');
+      // Limpiar cualquier sesión anterior para evitar inicios de sesión automáticos
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
 
-      if (token) {
-        try {
-          const response = await authService.getCurrentUser();
-          setUser(response.data);
-          setIsAuthenticated(true);
-        } catch (error) {
-          // Clear invalid token
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-        }
-      }
-
+      setUser(null);
+      setIsAuthenticated(false);
       setIsLoading(false);
     };
 
@@ -57,11 +49,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (credentials: LoginData): Promise<void> => {
+    console.log('AuthContext: login called with credentials:', credentials);
     setIsLoading(true);
     setError(null);
 
     try {
+      console.log('AuthContext: calling authService.login');
       const response = await authService.login(credentials);
+      console.log('AuthContext: login response received:', response);
 
       // Save token and user data
       localStorage.setItem('token', response.token);
@@ -69,11 +64,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       setUser(response.data);
       setIsAuthenticated(true);
+      console.log('AuthContext: user authenticated successfully');
     } catch (error: any) {
+      console.error('AuthContext: login error:', error);
       setError(error.response?.data?.error || 'Failed to login');
       throw error;
     } finally {
       setIsLoading(false);
+      console.log('AuthContext: login process completed');
     }
   };
 

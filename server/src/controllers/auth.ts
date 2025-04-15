@@ -51,10 +51,12 @@ export const login = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    console.log('Server: login request received:', req.body);
     const { email, password } = req.body;
 
     // Validate email & password
     if (!email || !password) {
+      console.log('Server: email or password missing');
       res.status(400).json({
         success: false,
         error: 'Please provide an email and password'
@@ -62,10 +64,12 @@ export const login = async (
       return;
     }
 
+    console.log('Server: attempting to login user with email:', email);
     // Check for user
     const user = await loginUser({ email, password });
 
     if (!user) {
+      console.log('Server: invalid credentials for email:', email);
       res.status(401).json({
         success: false,
         error: 'Invalid credentials'
@@ -73,8 +77,11 @@ export const login = async (
       return;
     }
 
+    console.log('Server: user found:', user.id, user.email, user.role);
+
     // Generate token
     const token = generateToken(user.id);
+    console.log('Server: token generated');
 
     // Set cookie
     const cookieOptions = {
@@ -86,15 +93,18 @@ export const login = async (
     };
 
     res.cookie('token', token, cookieOptions);
+    console.log('Server: cookie set');
 
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user;
 
+    console.log('Server: sending response');
     res.status(200).json({
       success: true,
       token,
       data: userWithoutPassword
     });
+    console.log('Server: response sent');
   } catch (error) {
     next(error);
   }

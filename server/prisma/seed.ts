@@ -1,4 +1,4 @@
-import { PrismaClient, Role, EventStatus, Sport, User, Event } from '@prisma/client';
+import { PrismaClient, Role, EventStatus, Sport, User, Event, BetType, BetStatus, MarketStatus } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import * as readline from 'readline';
 
@@ -13,6 +13,9 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
+// Check if force flag is set
+const forceRun = process.argv.includes('--force');
+
 async function main() {
   // Safety check for production environment
   if (isProduction) {
@@ -25,16 +28,21 @@ async function main() {
   console.log('\x1b[33m%s\x1b[0m', '⚠️  WARNING: This script will DELETE ALL EXISTING DATA in the database!');
   console.log('\x1b[33m%s\x1b[0m', '⚠️  It should only be used in development or testing environments.');
 
-  // Ask for confirmation
-  await new Promise<void>((resolve) => {
-    rl.question('Are you sure you want to continue? (yes/no): ', (answer) => {
-      if (answer.toLowerCase() !== 'yes') {
-        console.log('Seed operation cancelled.');
-        process.exit(0);
-      }
-      resolve();
+  // Skip confirmation if force flag is set
+  if (!forceRun) {
+    // Ask for confirmation
+    await new Promise<void>((resolve) => {
+      rl.question('Are you sure you want to continue? (yes/no): ', (answer) => {
+        if (answer.toLowerCase() !== 'yes') {
+          console.log('Seed operation cancelled.');
+          process.exit(0);
+        }
+        resolve();
+      });
     });
-  });
+  } else {
+    console.log('Force flag detected, skipping confirmation...');
+  }
 
   console.log('Starting seed...');
 
@@ -49,7 +57,13 @@ async function main() {
   const sports = await createSports();
 
   // Create events for each sport
-  await createEvents(sports);
+  const events = await createEvents(sports);
+
+  // Create markets for each event
+  const markets = await createMarkets(events);
+
+  // Create bets for the markets
+  await createBets(regularUsers, markets);
 
   console.log('\x1b[32m%s\x1b[0m', 'Seed completed successfully!');
   rl.close();
@@ -59,7 +73,9 @@ async function clearDatabase() {
   console.log('Clearing existing data...');
 
   // Delete in reverse order to avoid foreign key constraints
+  await prisma.betMatch.deleteMany({});
   await prisma.bet.deleteMany({});
+  await prisma.market.deleteMany({});
   await prisma.participant.deleteMany({});
   await prisma.event.deleteMany({});
   await prisma.sport.deleteMany({});
@@ -76,10 +92,12 @@ async function createAdminUser(): Promise<User> {
   const admin = await prisma.user.create({
     data: {
       name: 'Admin User',
-      email: 'admin@example.com',
+      email: 'admin@aganar.com',
       password: hashedPassword,
       role: Role.ADMIN,
       balance: 1000,
+      availableBalance: 1000,
+      reservedBalance: 0,
     },
   });
 
@@ -94,6 +112,7 @@ async function createRegularUsers(): Promise<User[]> {
 
   for (let i = 1; i <= 5; i++) {
     const hashedPassword = await bcrypt.hash('password123', 10);
+    const balance = 100 * i;
 
     const user = await prisma.user.create({
       data: {
@@ -101,7 +120,9 @@ async function createRegularUsers(): Promise<User[]> {
         email: `user${i}@example.com`,
         password: hashedPassword,
         role: Role.USER,
-        balance: 100 * i,
+        balance: balance,
+        availableBalance: balance,
+        reservedBalance: 0,
       },
     });
 
@@ -142,11 +163,12 @@ async function createSports(): Promise<Sport[]> {
   return sports;
 }
 
-async function createEvents(sports: Sport[]): Promise<void> {
+async function createEvents(sports: Sport[]): Promise<Event[]> {
   console.log('Creating events...');
 
   // Current date for reference
   const now = new Date();
+  const events: Event[] = [];
 
   // Create events for each sport
   for (const sport of sports) {
@@ -170,12 +192,15 @@ async function createEvents(sports: Sport[]): Promise<void> {
         },
       });
 
+      events.push(event);
       console.log(`Event created: ${event.name}`);
 
       // Create participants for the event
       await createParticipants(event);
     }
   }
+
+  return events;
 }
 
 async function createParticipants(event: Event): Promise<void> {
@@ -213,6 +238,175 @@ async function createParticipants(event: Event): Promise<void> {
     });
 
     console.log(`Participant created: ${participant.name} with odds ${participant.odds}`);
+  }
+}
+
+async function createMarkets(events: Event[]) {
+  console.log('Creating markets...');
+
+  const markets = [];
+  const marketTypes = [
+    'Match Winner',
+    'Total Goals',
+    'First Scorer',
+    'Handicap',
+    'Correct Score'
+  ];
+
+  for (const event of events) {
+    // Create 1-3 markets per event
+    const numMarkets = Math.floor(Math.random() * 3) + 1;
+
+    for (let i = 0; i < numMarkets; i++) {
+      const marketName = marketTypes[i % marketTypes.length];
+
+      const market = await prisma.market.create({
+        data: {
+          name: marketName,
+          status: MarketStatus.OPEN,
+          eventId: event.id
+        }
+      });
+
+      markets.push(market);
+      console.log(`Market created: ${market.name} for event ${event.name}`);
+    }
+  }
+
+  return markets;
+}
+
+async function createBets(users: User[], markets: any[]) {
+  console.log('Creating bets...');
+
+  // Get all participants to use for selections
+  const participants = await prisma.participant.findMany();
+
+  for (const market of markets) {
+    // Get participants for this market's event
+    const eventParticipants = participants.filter(p => p.eventId === market.eventId);
+    if (eventParticipants.length === 0) continue;
+
+    // Create some back bets
+    for (let i = 0; i < 3; i++) {
+      // Pick a random user and participant
+      const user = users[Math.floor(Math.random() * users.length)];
+      const participant = eventParticipants[Math.floor(Math.random() * eventParticipants.length)];
+
+      // Random amount between 10 and 50
+      const amount = Math.floor(Math.random() * 41) + 10;
+      // Random odds between 1.5 and 3.0
+      const odds = parseFloat((1.5 + Math.random() * 1.5).toFixed(2));
+
+      const backBet = await prisma.bet.create({
+        data: {
+          amount,
+          odds,
+          selection: participant.name,
+          status: BetStatus.UNMATCHED,
+          potentialWinnings: amount * odds,
+          type: BetType.BACK,
+          matchedAmount: 0,
+          userId: user.id,
+          eventId: market.eventId,
+          marketId: market.id
+        }
+      });
+
+      console.log(`Back bet created: ${backBet.id} by ${user.name} on ${participant.name}`);
+    }
+
+    // Create some lay bets
+    for (let i = 0; i < 2; i++) {
+      // Pick a random user and participant
+      const user = users[Math.floor(Math.random() * users.length)];
+      const participant = eventParticipants[Math.floor(Math.random() * eventParticipants.length)];
+
+      // Random amount between 10 and 50
+      const amount = Math.floor(Math.random() * 41) + 10;
+      // Random odds between 1.5 and 3.0
+      const odds = parseFloat((1.5 + Math.random() * 1.5).toFixed(2));
+      // Calculate liability
+      const liability = amount * (odds - 1);
+
+      const layBet = await prisma.bet.create({
+        data: {
+          amount,
+          odds,
+          selection: participant.name,
+          status: BetStatus.UNMATCHED,
+          potentialWinnings: amount,
+          type: BetType.LAY,
+          liability,
+          matchedAmount: 0,
+          userId: user.id,
+          eventId: market.eventId,
+          marketId: market.id
+        }
+      });
+
+      console.log(`Lay bet created: ${layBet.id} by ${user.name} against ${participant.name}`);
+    }
+
+    // Create some matched bets
+    if (Math.random() > 0.5) {
+      // Pick a random user and participant
+      const backUser = users[Math.floor(Math.random() * users.length)];
+      const layUser = users[Math.floor(Math.random() * users.length)];
+      const participant = eventParticipants[Math.floor(Math.random() * eventParticipants.length)];
+
+      // Random amount between 10 and 50
+      const amount = Math.floor(Math.random() * 41) + 10;
+      // Random odds between 1.5 and 3.0
+      const odds = parseFloat((1.5 + Math.random() * 1.5).toFixed(2));
+      // Calculate liability
+      const liability = amount * (odds - 1);
+
+      // Create back bet
+      const backBet = await prisma.bet.create({
+        data: {
+          amount,
+          odds,
+          selection: participant.name,
+          status: BetStatus.FULLY_MATCHED,
+          potentialWinnings: amount * odds,
+          type: BetType.BACK,
+          matchedAmount: amount,
+          userId: backUser.id,
+          eventId: market.eventId,
+          marketId: market.id
+        }
+      });
+
+      // Create lay bet
+      const layBet = await prisma.bet.create({
+        data: {
+          amount,
+          odds,
+          selection: participant.name,
+          status: BetStatus.FULLY_MATCHED,
+          potentialWinnings: amount,
+          type: BetType.LAY,
+          liability,
+          matchedAmount: amount,
+          userId: layUser.id,
+          eventId: market.eventId,
+          marketId: market.id
+        }
+      });
+
+      // Create bet match
+      const betMatch = await prisma.betMatch.create({
+        data: {
+          amount,
+          odds,
+          backBetId: backBet.id,
+          layBetId: layBet.id
+        }
+      });
+
+      console.log(`Matched bets created: Back ${backBet.id} and Lay ${layBet.id}`);
+    }
   }
 }
 

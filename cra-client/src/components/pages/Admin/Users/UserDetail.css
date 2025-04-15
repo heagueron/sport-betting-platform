@@ -1,0 +1,147 @@
+.user-detail-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  /* Añadir margen superior para separar del header */
+  margin-top: 80px;
+}
+
+.user-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.user-detail-header h1 {
+  margin: 0;
+  color: #333;
+}
+
+.user-detail-success {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.user-detail-error-message {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.user-detail-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.user-detail-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.user-detail-section h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.2rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.user-detail-field {
+  margin-bottom: 16px;
+}
+
+.user-detail-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #555;
+}
+
+.user-detail-input,
+.user-detail-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.user-detail-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.user-detail-status {
+  margin: 20px 0;
+}
+
+.user-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.user-detail-footer {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-button {
+  min-width: 150px;
+}
+
+.role-button,
+.activate-button,
+.deactivate-button {
+  min-width: 200px;
+}
+
+.user-detail-loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.user-detail-error {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.1rem;
+  color: #d32f2f;
+  background-color: #ffebee;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .user-detail-card {
+    flex-direction: column;
+  }
+
+  .user-detail-section {
+    width: 100%;
+  }
+
+  .user-detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-detail-header button {
+    margin-top: 10px;
+  }
+}

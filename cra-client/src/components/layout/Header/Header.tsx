@@ -10,6 +10,7 @@ type TFunction = (key: string, options?: any) => string;
 
 interface HeaderProps {
   isAuthenticated?: boolean;
+  isAdmin?: boolean;
   onLogin?: () => void;
   onSignup?: () => void;
   onLogout?: () => void;
@@ -17,6 +18,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({
   isAuthenticated = false,
+  isAdmin = false,
   onLogin,
   onSignup,
   onLogout,
@@ -58,6 +60,11 @@ const Header: React.FC<HeaderProps> = ({
                 <li className="nav-item">
                   <NavLink to="/about" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>{t('header.aboutUs')}</NavLink>
                 </li>
+                {isAuthenticated && isAdmin && (
+                  <li className="nav-item">
+                    <NavLink to="/admin" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Admin</NavLink>
+                  </li>
+                )}
                 <li className="nav-item mobile-only">
                   {isAuthenticated ? (
                     <Button variant="outline" onClick={onLogout} className="modern-button mobile-button">

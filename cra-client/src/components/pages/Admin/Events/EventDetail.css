@@ -1,0 +1,231 @@
+.event-detail-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  /* Añadir margen superior para separar del header */
+  margin-top: 80px;
+}
+
+.event-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  /* Anular el fondo del header global */
+  background: transparent;
+  padding: 0;
+}
+
+.event-detail-header h1 {
+  margin: 0;
+  color: #333;
+}
+
+.event-detail-success {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.event-detail-error-message {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.event-detail-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.event-detail-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.event-detail-section h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.2rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+/* Estilos para la sección de participantes */
+.event-detail-participants {
+  margin-bottom: 24px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 16px;
+  background-color: #f9f9f9;
+}
+
+.participants-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.participants-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.event-detail-participants-dropdown {
+  margin-top: 12px;
+}
+
+.participants-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.participant-item-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: white;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.participant-name {
+  font-weight: 500;
+}
+
+.participant-odds {
+  color: #666;
+}
+
+.event-detail-field {
+  margin-bottom: 16px;
+}
+
+.event-detail-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #555;
+}
+
+.event-detail-input,
+.event-detail-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.event-detail-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.event-detail-help-text {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.event-detail-status {
+  margin: 20px 0;
+}
+
+.event-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.event-detail-footer {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save-button {
+  min-width: 150px;
+}
+
+.status-button {
+  min-width: 200px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-scheduled {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+}
+
+.status-live {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+}
+
+.status-completed {
+  background-color: #f5f5f5;
+  color: #424242;
+}
+
+.status-cancelled {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.event-detail-loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.event-detail-error {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.1rem;
+  color: #d32f2f;
+  background-color: #ffebee;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .event-detail-card {
+    flex-direction: column;
+  }
+
+  .event-detail-section {
+    width: 100%;
+  }
+
+  .event-detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .event-detail-header button {
+    margin-top: 10px;
+  }
+}

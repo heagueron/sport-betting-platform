@@ -11,6 +11,7 @@ import betRoutes from './routes/bet';
 import sportRoutes from './routes/sport';
 import eventRoutes from './routes/event';
 import adminRoutes from './routes/admin';
+import marketRoutes from './routes/market';
 
 // Import middleware
 import { errorHandler } from './middleware/error';
@@ -22,7 +23,10 @@ const app: Express = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 app.use(helmet());
 app.use(cookieParser());
 
@@ -41,6 +45,7 @@ app.use('/api/bets', betRoutes);
 app.use('/api/sports', sportRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/markets', marketRoutes);
 
 // Health check route
 app.get('/health', (_req, res) => {
