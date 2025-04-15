@@ -1,4 +1,4 @@
-import { Bet, BetStatus, BetType, User, PrismaClient } from '@prisma/client';
+import { Bet, BetStatus, BetType, User, PrismaClient, TransactionType, TransactionStatus } from '@prisma/client';
 import prisma from '../config/prisma';
 import { BetData } from '../types';
 import * as betMatchingService from './betMatching';
@@ -69,11 +69,27 @@ export const createBackBet = async (
     }
 
     // Update user balance
+    // Usar bloqueo optimista para evitar condiciones de carrera
     await tx.user.update({
-      where: { id: userId },
+      where: {
+        id: userId,
+        version: user.version // Asegurar que nadie más ha modificado el usuario
+      },
       data: {
         balance: user.balance - betData.amount,
-        availableBalance: user.availableBalance - betData.amount
+        availableBalance: user.availableBalance - betData.amount,
+        version: { increment: 1 } // Incrementar la versión
+      }
+    });
+
+    // Registrar la transacción
+    await tx.transaction.create({
+      data: {
+        userId,
+        type: 'BET' as TransactionType,
+        amount: betData.amount,
+        status: TransactionStatus.COMPLETADA,
+        description: `Apuesta BACK en ${betData.selection} a cuota ${betData.odds}`
       }
     });
 
@@ -183,11 +199,27 @@ export const createLayBet = async (
     }
 
     // Update user balance - reserve the liability amount
+    // Usar bloqueo optimista para evitar condiciones de carrera
     await tx.user.update({
-      where: { id: userId },
+      where: {
+        id: userId,
+        version: user.version // Asegurar que nadie más ha modificado el usuario
+      },
       data: {
         availableBalance: user.availableBalance - liability,
-        reservedBalance: user.reservedBalance + liability
+        reservedBalance: user.reservedBalance + liability,
+        version: { increment: 1 } // Incrementar la versión
+      }
+    });
+
+    // Registrar la transacción
+    await tx.transaction.create({
+      data: {
+        userId,
+        type: 'RESERVE' as TransactionType,
+        amount: liability,
+        status: TransactionStatus.COMPLETADA,
+        description: `Reserva de fondos para apuesta LAY en ${betData.selection} a cuota ${betData.odds}`
       }
     });
 
@@ -281,21 +313,54 @@ export const cancelUnmatchedBet = async (
 
     // Refund the unmatched amount
     if (bet.type === BetType.BACK) {
+      // Usar bloqueo optimista para evitar condiciones de carrera
       await tx.user.update({
-        where: { id: bet.userId },
+        where: {
+          id: bet.userId,
+          version: bet.user.version // Asegurar que nadie más ha modificado el usuario
+        },
         data: {
           balance: bet.user.balance + refundAmount,
-          availableBalance: bet.user.availableBalance + refundAmount
+          availableBalance: bet.user.availableBalance + refundAmount,
+          version: { increment: 1 } // Incrementar la versión
+        }
+      });
+
+      // Registrar la transacción de reembolso
+      await tx.transaction.create({
+        data: {
+          userId: bet.userId,
+          type: 'REFUND' as TransactionType,
+          amount: refundAmount,
+          status: TransactionStatus.COMPLETADA,
+          description: `Reembolso por cancelación de apuesta BACK en ${bet.selection} a cuota ${bet.odds}`
         }
       });
     } else if (bet.type === BetType.LAY && bet.liability) {
       // For lay bets, release the reserved liability proportionally
       const liabilityToRelease = bet.liability * (refundAmount / bet.amount);
+
+      // Usar bloqueo optimista para evitar condiciones de carrera
       await tx.user.update({
-        where: { id: bet.userId },
+        where: {
+          id: bet.userId,
+          version: bet.user.version // Asegurar que nadie más ha modificado el usuario
+        },
         data: {
           availableBalance: bet.user.availableBalance + liabilityToRelease,
-          reservedBalance: bet.user.reservedBalance - liabilityToRelease
+          reservedBalance: bet.user.reservedBalance - liabilityToRelease,
+          version: { increment: 1 } // Incrementar la versión
+        }
+      });
+
+      // Registrar la transacción de liberación de fondos
+      await tx.transaction.create({
+        data: {
+          userId: bet.userId,
+          type: 'RELEASE' as TransactionType,
+          amount: liabilityToRelease,
+          status: TransactionStatus.COMPLETADA,
+          description: `Liberación de fondos por cancelación de apuesta LAY en ${bet.selection} a cuota ${bet.odds}`
         }
       });
     }

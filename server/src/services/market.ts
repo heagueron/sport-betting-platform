@@ -1,4 +1,5 @@
-import { Market, MarketStatus } from '@prisma/client';
+import { Market, MarketStatus, TransactionStatus, TransactionType } from '@prisma/client';
+import * as concurrencyService from './concurrency';
 import prisma from '../config/prisma';
 import { MarketData } from '../types';
 
@@ -253,9 +254,10 @@ export const settleMarket = async (
     return 0;
   }
 
-  // Settle bets in a transaction
+  // Settle bets in a transaction with concurrency management
   let settledCount = 0;
-  await prisma.$transaction(async (tx) => {
+  await concurrencyService.withRetry(async () => {
+    return prisma.$transaction(async (tx) => {
     for (const bet of matchedBets) {
       // Determine bet result
       let result;
@@ -282,19 +284,34 @@ export const settleMarket = async (
       // Update bet status
       await tx.bet.update({
         where: { id: bet.id },
-        data: { 
+        data: {
           status: result === 'WON' ? 'WON' : 'LOST',
           settledAt: new Date()
         }
       });
 
-      // Update user balance if bet won
+      // Update user balance if bet won with optimistic locking
       if (result === 'WON') {
         await tx.user.update({
-          where: { id: bet.userId },
-          data: { 
+          where: {
+            id: bet.userId,
+            version: bet.user.version // Asegurar que nadie más ha modificado el usuario
+          },
+          data: {
             balance: bet.user.balance + winnings,
-            availableBalance: bet.user.availableBalance + winnings
+            availableBalance: bet.user.availableBalance + winnings,
+            version: { increment: 1 } // Incrementar la versión
+          }
+        });
+
+        // Registrar la transacción de ganancias
+        await tx.transaction.create({
+          data: {
+            userId: bet.userId,
+            type: 'WINNING' as TransactionType,
+            amount: winnings,
+            status: 'COMPLETADA' as TransactionStatus,
+            description: `Ganancias por apuesta ${bet.type} en ${bet.selection} a cuota ${bet.odds}`
           }
         });
       }
@@ -302,9 +319,24 @@ export const settleMarket = async (
       // Release reserved balance for lay bets
       if (bet.type === 'LAY' && bet.liability) {
         await tx.user.update({
-          where: { id: bet.userId },
-          data: { 
-            reservedBalance: bet.user.reservedBalance - bet.liability
+          where: {
+            id: bet.userId,
+            version: bet.user.version // Asegurar que nadie más ha modificado el usuario
+          },
+          data: {
+            reservedBalance: bet.user.reservedBalance - bet.liability,
+            version: { increment: 1 } // Incrementar la versión
+          }
+        });
+
+        // Registrar la transacción de liberación de fondos
+        await tx.transaction.create({
+          data: {
+            userId: bet.userId,
+            type: 'RELEASE' as TransactionType,
+            amount: bet.liability,
+            status: 'COMPLETADA' as TransactionStatus,
+            description: `Liberación de fondos reservados para apuesta LAY en ${bet.selection}`
           }
         });
       }
@@ -312,12 +344,19 @@ export const settleMarket = async (
       settledCount++;
     }
 
-    // Update market status to settled
+    // Update market status to settled with optimistic locking
     await tx.market.update({
-      where: { id: marketId },
-      data: { status: MarketStatus.SETTLED }
+      where: {
+        id: marketId,
+        version: market.version // Asegurar que nadie más ha modificado el mercado
+      },
+      data: {
+        status: MarketStatus.SETTLED,
+        version: { increment: 1 } // Incrementar la versión
+      }
     });
-  });
+    });
+  }, 3); // Máximo 3 reintentos
 
   return settledCount;
 };

@@ -219,6 +219,9 @@ enum TransactionType {
   WITHDRAWAL
   BET
   WINNING
+  RESERVE      // Para reservar fondos en apuestas LAY
+  RELEASE      // Para liberar fondos reservados
+  REFUND       // Para reembolsos de apuestas canceladas
 }
 
 enum TransactionStatus {
