@@ -1,5 +1,7 @@
-import { Bet, BetMatch, BetStatus, BetType } from '@prisma/client';
+import { Bet, BetMatch, BetStatus, BetType, PrismaClient } from '@prisma/client';
 import prisma from '../config/prisma';
+import { AppError } from '../utils/errors';
+import * as concurrencyService from './concurrency';
 
 /**
  * Calculate the liability for a lay bet
@@ -50,6 +52,9 @@ export const calculatePotentialLoss = (bet: Bet): number => {
 export const matchBet = async (
   betId: string
 ): Promise<{ matchedAmount: number; matches: BetMatch[] }> => {
+  // Añadir la apuesta a la cola de procesamiento
+  await concurrencyService.addBetToProcessingQueue(betId);
+
   // Get the bet to match with user information
   const bet = await prisma.bet.findUnique({
     where: { id: betId },
@@ -60,33 +65,51 @@ export const matchBet = async (
   });
 
   if (!bet) {
-    throw new Error('Bet not found');
+    throw new AppError('Bet not found', 404);
   }
 
   // Only match unmatched or partially matched bets
   if (bet.status !== BetStatus.UNMATCHED && bet.status !== BetStatus.PARTIALLY_MATCHED) {
-    throw new Error('Bet is not available for matching');
+    throw new AppError('Bet is not available for matching', 400);
   }
 
   // Check if market is still open
   if (bet.market.status !== 'OPEN') {
-    throw new Error('Market is not open for matching');
+    throw new AppError('Market is not open for matching', 400);
   }
 
-  // Find matching bets
-  const matchingBets = await findMatchingBets(bet);
+  // Usar el servicio de concurrencia para adquirir un bloqueo en el mercado
+  return concurrencyService.withMarketLock(bet.marketId, async (tx) => {
+    // Volver a cargar la apuesta dentro de la transacción para asegurar datos frescos
+    const freshBet = await tx.bet.findUnique({
+      where: { id: betId },
+      include: {
+        user: true,
+        market: true
+      }
+    });
 
-  if (matchingBets.length === 0) {
-    return { matchedAmount: 0, matches: [] };
-  }
+    if (!freshBet) {
+      throw new AppError('Bet not found', 404);
+    }
 
-  // Match the bet with available matching bets
-  const matches: BetMatch[] = [];
-  let remainingAmount = bet.amount - bet.matchedAmount;
-  let totalMatchedAmount = 0;
+    // Verificar nuevamente si el mercado está abierto (podría haber cambiado)
+    if (freshBet.market.status !== 'OPEN') {
+      throw new AppError('Market is not open for matching', 400);
+    }
 
-  // Process in a transaction
-  await prisma.$transaction(async (tx) => {
+    // Find matching bets within the transaction
+    const matchingBets = await findMatchingBetsWithinTransaction(freshBet, tx);
+
+    if (matchingBets.length === 0) {
+      return { matchedAmount: 0, matches: [] };
+    }
+
+    // Match the bet with available matching bets
+    const matches: BetMatch[] = [];
+    let remainingAmount = freshBet.amount - freshBet.matchedAmount;
+    let totalMatchedAmount = 0;
+
     for (const matchingBet of matchingBets) {
       if (remainingAmount <= 0) break;
 
@@ -101,22 +124,22 @@ export const matchBet = async (
       // For back bets, use the lower of the two odds
       // For lay bets, use the higher of the two odds
       let matchOdds;
-      if (bet.type === BetType.BACK) {
+      if (freshBet.type === BetType.BACK) {
         // When matching a back bet with a lay bet, use the lay bet odds if they're lower
-        matchOdds = Math.min(bet.odds, matchingBet.odds);
+        matchOdds = Math.min(freshBet.odds, matchingBet.odds);
       } else {
         // When matching a lay bet with a back bet, use the back bet odds if they're higher
-        matchOdds = Math.max(bet.odds, matchingBet.odds);
+        matchOdds = Math.max(freshBet.odds, matchingBet.odds);
       }
 
       // Create the match
       let backBetId, layBetId;
-      if (bet.type === BetType.BACK) {
-        backBetId = bet.id;
+      if (freshBet.type === BetType.BACK) {
+        backBetId = freshBet.id;
         layBetId = matchingBet.id;
       } else {
         backBetId = matchingBet.id;
-        layBetId = bet.id;
+        layBetId = freshBet.id;
       }
 
       const match = await tx.betMatch.create({
@@ -131,38 +154,47 @@ export const matchBet = async (
       matches.push(match);
       totalMatchedAmount += matchAmount;
 
-      // Update the current bet
-      const newBetMatchedAmount = bet.matchedAmount + matchAmount;
+      // Update the current bet with optimistic locking
+      const newBetMatchedAmount = freshBet.matchedAmount + matchAmount;
       await tx.bet.update({
-        where: { id: bet.id },
+        where: {
+          id: freshBet.id,
+          version: freshBet.version // Asegurar que nadie más ha modificado la apuesta
+        },
         data: {
           matchedAmount: newBetMatchedAmount,
-          status: newBetMatchedAmount >= bet.amount
+          status: newBetMatchedAmount >= freshBet.amount
             ? BetStatus.FULLY_MATCHED
-            : BetStatus.PARTIALLY_MATCHED
+            : BetStatus.PARTIALLY_MATCHED,
+          version: { increment: 1 }, // Incrementar la versión
+          processingStatus: 'PROCESSED'
         }
       });
 
-      // Update the matching bet
+      // Update the matching bet with optimistic locking
       const newMatchingBetMatchedAmount = matchingBet.matchedAmount + matchAmount;
       await tx.bet.update({
-        where: { id: matchingBet.id },
+        where: {
+          id: matchingBet.id,
+          version: matchingBet.version // Asegurar que nadie más ha modificado la apuesta
+        },
         data: {
           matchedAmount: newMatchingBetMatchedAmount,
           status: newMatchingBetMatchedAmount >= matchingBet.amount
             ? BetStatus.FULLY_MATCHED
-            : BetStatus.PARTIALLY_MATCHED
+            : BetStatus.PARTIALLY_MATCHED,
+          version: { increment: 1 } // Incrementar la versión
         }
       });
 
       remainingAmount -= matchAmount;
     }
-  });
 
-  return {
-    matchedAmount: totalMatchedAmount,
-    matches
-  };
+    return {
+      matchedAmount: totalMatchedAmount,
+      matches
+    };
+  });
 };
 
 /**
@@ -182,6 +214,51 @@ export const findMatchingBets = async (bet: Bet): Promise<Bet[]> => {
 
   // Find matching bets
   const matchingBets = await prisma.bet.findMany({
+    where: {
+      type: oppositeType,
+      selection: bet.selection,
+      marketId: bet.marketId,
+      status: {
+        in: [BetStatus.UNMATCHED, BetStatus.PARTIALLY_MATCHED]
+      },
+      odds: oddsCondition,
+      // Don't match with bets from the same user
+      userId: { not: bet.userId }
+    },
+    orderBy: [
+      // First priority: best odds
+      bet.type === BetType.BACK
+        ? { odds: 'asc' } // For back bets, prioritize lay bets with lowest odds
+        : { odds: 'desc' }, // For lay bets, prioritize back bets with highest odds
+      // Second priority: oldest first (FIFO)
+      { createdAt: 'asc' }
+    ]
+  });
+
+  return matchingBets;
+};
+
+/**
+ * Find bets that can be matched with the given bet within a transaction
+ * @param bet Bet to match
+ * @param tx Prisma transaction client
+ * @returns List of matching bets
+ */
+export const findMatchingBetsWithinTransaction = async (
+  bet: Bet,
+  tx: PrismaClient
+): Promise<Bet[]> => {
+  // Find bets of the opposite type with the same selection and market
+  const oppositeType = bet.type === BetType.BACK ? BetType.LAY : BetType.BACK;
+
+  // For back bets, find lay bets with the same or lower odds
+  // For lay bets, find back bets with the same or higher odds
+  const oddsCondition = bet.type === BetType.BACK
+    ? { lte: bet.odds } // For back bets, find lay bets with odds <= back odds
+    : { gte: bet.odds }; // For lay bets, find back bets with odds >= lay odds
+
+  // Find matching bets using the transaction client
+  const matchingBets = await tx.bet.findMany({
     where: {
       type: oppositeType,
       selection: bet.selection,
@@ -232,30 +309,30 @@ export const createBetMatch = async (
   });
 
   if (!backBet || !layBet) {
-    throw new Error('One or both bets not found');
+    throw new AppError('One or both bets not found', 404);
   }
 
   if (backBet.type !== BetType.BACK || layBet.type !== BetType.LAY) {
-    throw new Error('Invalid bet types for matching');
+    throw new AppError('Invalid bet types for matching', 400);
   }
 
   // Check if bets can be matched
   if (backBet.selection !== layBet.selection) {
-    throw new Error('Bets have different selections');
+    throw new AppError('Bets have different selections', 400);
   }
 
   if (backBet.marketId !== layBet.marketId) {
-    throw new Error('Bets are for different markets');
+    throw new AppError('Bets are for different markets', 400);
   }
 
   // Check if market is still open
   if (backBet.market.status !== 'OPEN' || layBet.market.status !== 'OPEN') {
-    throw new Error('Market is not open for matching');
+    throw new AppError('Market is not open for matching', 400);
   }
 
   // Check if odds are compatible
   if (backBet.odds < layBet.odds) {
-    throw new Error('Incompatible odds: back bet odds must be >= lay bet odds');
+    throw new AppError('Incompatible odds: back bet odds must be >= lay bet odds', 400);
   }
 
   // Check available amounts
@@ -263,16 +340,44 @@ export const createBetMatch = async (
   const layBetAvailable = layBet.amount - layBet.matchedAmount;
 
   if (backBetAvailable < amount || layBetAvailable < amount) {
-    throw new Error('Insufficient available amount for matching');
+    throw new AppError('Insufficient available amount for matching', 400);
   }
 
   // Validate amount is positive
   if (amount <= 0) {
-    throw new Error('Match amount must be positive');
+    throw new AppError('Match amount must be positive', 400);
   }
 
-  // Create the match in a transaction
-  return prisma.$transaction(async (tx) => {
+  // Usar el servicio de concurrencia para adquirir un bloqueo en el mercado
+  return concurrencyService.withMarketLock(backBet.marketId, async (tx) => {
+    // Volver a cargar las apuestas dentro de la transacción para asegurar datos frescos
+    const freshBackBet = await tx.bet.findUnique({
+      where: { id: backBetId },
+      include: { market: true }
+    });
+
+    const freshLayBet = await tx.bet.findUnique({
+      where: { id: layBetId },
+      include: { market: true }
+    });
+
+    if (!freshBackBet || !freshLayBet) {
+      throw new AppError('One or both bets not found', 404);
+    }
+
+    // Verificar nuevamente si el mercado está abierto (podría haber cambiado)
+    if (freshBackBet.market.status !== 'OPEN' || freshLayBet.market.status !== 'OPEN') {
+      throw new AppError('Market is not open for matching', 400);
+    }
+
+    // Verificar nuevamente las cantidades disponibles
+    const freshBackBetAvailable = freshBackBet.amount - freshBackBet.matchedAmount;
+    const freshLayBetAvailable = freshLayBet.amount - freshLayBet.matchedAmount;
+
+    if (freshBackBetAvailable < amount || freshLayBetAvailable < amount) {
+      throw new AppError('Insufficient available amount for matching', 400);
+    }
+
     // Create the match
     const match = await tx.betMatch.create({
       data: {
@@ -283,27 +388,35 @@ export const createBetMatch = async (
       }
     });
 
-    // Update the back bet
-    const newBackBetMatchedAmount = backBet.matchedAmount + amount;
+    // Update the back bet with optimistic locking
+    const newBackBetMatchedAmount = freshBackBet.matchedAmount + amount;
     await tx.bet.update({
-      where: { id: backBetId },
+      where: {
+        id: backBetId,
+        version: freshBackBet.version // Asegurar que nadie más ha modificado la apuesta
+      },
       data: {
         matchedAmount: newBackBetMatchedAmount,
-        status: newBackBetMatchedAmount >= backBet.amount
+        status: newBackBetMatchedAmount >= freshBackBet.amount
           ? BetStatus.FULLY_MATCHED
-          : BetStatus.PARTIALLY_MATCHED
+          : BetStatus.PARTIALLY_MATCHED,
+        version: { increment: 1 } // Incrementar la versión
       }
     });
 
-    // Update the lay bet
-    const newLayBetMatchedAmount = layBet.matchedAmount + amount;
+    // Update the lay bet with optimistic locking
+    const newLayBetMatchedAmount = freshLayBet.matchedAmount + amount;
     await tx.bet.update({
-      where: { id: layBetId },
+      where: {
+        id: layBetId,
+        version: freshLayBet.version // Asegurar que nadie más ha modificado la apuesta
+      },
       data: {
         matchedAmount: newLayBetMatchedAmount,
-        status: newLayBetMatchedAmount >= layBet.amount
+        status: newLayBetMatchedAmount >= freshLayBet.amount
           ? BetStatus.FULLY_MATCHED
-          : BetStatus.PARTIALLY_MATCHED
+          : BetStatus.PARTIALLY_MATCHED,
+        version: { increment: 1 } // Incrementar la versión
       }
     });
 

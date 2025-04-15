@@ -19,6 +19,7 @@ model User {
   balance         Float    @default(0)      // Mantener para compatibilidad
   availableBalance Float    @default(0)      // Nuevo campo
   reservedBalance  Float    @default(0)      // Nuevo campo
+  version         Int      @default(1)      // Campo para bloqueo optimista
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -81,6 +82,9 @@ model Market {
   id          String       @id @default(uuid())
   name        String       // Ej: "Ganador del partido"
   status      MarketStatus @default(OPEN)
+  version     Int          @default(1)      // Campo para bloqueo optimista
+  locked      Boolean      @default(false)  // Campo para bloqueo pesimista
+  lockedAt    DateTime?                     // Timestamp del bloqueo
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
@@ -102,6 +106,9 @@ model Bet {
   type             BetType   @default(BACK)       // Nuevo campo
   liability        Float?                         // Nuevo campo para apuestas LAY
   matchedAmount    Float     @default(0)          // Nuevo campo
+  version          Int       @default(1)          // Campo para bloqueo optimista
+  processingQueue  Int       @default(0)          // Posición en la cola de procesamiento
+  processingStatus String?                        // Estado de procesamiento
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   settledAt        DateTime?

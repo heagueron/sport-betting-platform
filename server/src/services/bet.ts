@@ -1,8 +1,9 @@
-import { Bet, BetStatus, BetType, User } from '@prisma/client';
+import { Bet, BetStatus, BetType, User, PrismaClient } from '@prisma/client';
 import prisma from '../config/prisma';
 import { BetData } from '../types';
 import * as betMatchingService from './betMatching';
-import { AppError } from '../utils/appError';
+import * as concurrencyService from './concurrency';
+import { AppError } from '../utils/errors';
 
 /**
  * Create a new back bet
@@ -17,8 +18,10 @@ export const createBackBet = async (
   // Calculate potential winnings
   const potentialWinnings = betData.amount * betData.odds;
 
-  // Create bet in a transaction to handle balance update
-  const bet = await prisma.$transaction(async (tx) => {
+  // Usar el servicio de concurrencia para manejar reintentos en caso de conflictos
+  const bet = await concurrencyService.withRetry(async () => {
+    // Create bet in a transaction with aislamiento serializable
+    return prisma.$transaction(async (tx) => {
     // Get user
     const user = await tx.user.findUnique({
       where: { id: userId }
@@ -88,14 +91,17 @@ export const createBackBet = async (
         marketId: betData.marketId
       }
     });
-  });
+    });
+  }, 3); // Máximo 3 reintentos
 
-  // Try to match the bet
-  try {
-    await betMatchingService.matchBet(bet.id);
-  } catch (error) {
-    console.error('Error matching bet:', error);
-  }
+  // Try to match the bet asíncronamente para no bloquear la respuesta
+  setTimeout(async () => {
+    try {
+      await betMatchingService.matchBet(bet.id);
+    } catch (error) {
+      console.error('Error matching bet:', error);
+    }
+  }, 0);
 
   // Return the bet with fresh data after matching
   return prisma.bet.findUnique({
@@ -126,8 +132,10 @@ export const createLayBet = async (
   // Calculate liability (potential loss)
   const liability = betData.amount * (betData.odds - 1);
 
-  // Create bet in a transaction to handle balance update
-  const bet = await prisma.$transaction(async (tx) => {
+  // Usar el servicio de concurrencia para manejar reintentos en caso de conflictos
+  const bet = await concurrencyService.withRetry(async () => {
+    // Create bet in a transaction with aislamiento serializable
+    return prisma.$transaction(async (tx) => {
     // Get user
     const user = await tx.user.findUnique({
       where: { id: userId }
@@ -197,14 +205,17 @@ export const createLayBet = async (
         marketId: betData.marketId
       }
     });
-  });
+    });
+  }, 3); // Máximo 3 reintentos
 
-  // Try to match the bet
-  try {
-    await betMatchingService.matchBet(bet.id);
-  } catch (error) {
-    console.error('Error matching bet:', error);
-  }
+  // Try to match the bet asíncronamente para no bloquear la respuesta
+  setTimeout(async () => {
+    try {
+      await betMatchingService.matchBet(bet.id);
+    } catch (error) {
+      console.error('Error matching bet:', error);
+    }
+  }, 0);
 
   // Return the bet with fresh data after matching
   return prisma.bet.findUnique({
@@ -255,8 +266,10 @@ export const cancelUnmatchedBet = async (
   // Calculate refund amount
   const refundAmount = bet.amount - bet.matchedAmount;
 
-  // Cancel bet in a transaction
-  return prisma.$transaction(async (tx) => {
+  // Usar el servicio de concurrencia para manejar reintentos en caso de conflictos
+  return concurrencyService.withRetry(async () => {
+    // Cancel bet in a transaction with aislamiento serializable
+    return prisma.$transaction(async (tx) => {
     // Update bet status
     const updatedBet = await tx.bet.update({
       where: { id: betId },
@@ -288,7 +301,8 @@ export const cancelUnmatchedBet = async (
     }
 
     return updatedBet;
-  });
+    });
+  }, 3); // Máximo 3 reintentos
 };
 
 /**
