@@ -25,7 +25,7 @@ const MarketCreate: React.FC = () => {
   const fetchEvents = async () => {
     setEventsLoading(true);
     try {
-      const response = await adminService.getEvents({ status: 'UPCOMING' });
+      const response = await adminService.getEvents({ status: 'SCHEDULED' });
       setEvents(response.data);
     } catch (err) {
       console.error('Error fetching events:', err);
@@ -53,32 +53,32 @@ const MarketCreate: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validaciones
     if (!name.trim()) {
       setError('El nombre del mercado es obligatorio');
       return;
     }
-    
+
     if (!eventId) {
       setError('Debes seleccionar un evento');
       return;
     }
-    
+
     // Validar que haya al menos dos selecciones y que todas tengan nombre
     if (selections.length < 2) {
       setError('Debes añadir al menos dos selecciones');
       return;
     }
-    
+
     if (selections.some(selection => !selection.name.trim())) {
       setError('Todas las selecciones deben tener un nombre');
       return;
     }
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       // Crear el mercado
       const marketData = {
@@ -86,9 +86,9 @@ const MarketCreate: React.FC = () => {
         eventId,
         selections: selections.map(s => s.name)
       };
-      
+
       const response = await adminService.createMarket(marketData);
-      
+
       // Redirigir a la página de detalle del mercado creado
       navigate(`/admin/markets/${response.data.id}`);
     } catch (err) {
@@ -101,9 +101,9 @@ const MarketCreate: React.FC = () => {
   return (
     <div className="market-create-container">
       <h1>Crear Nuevo Mercado</h1>
-      
+
       {error && <div className="error-message">{error}</div>}
-      
+
       <form onSubmit={handleSubmit} className="market-form">
         <div className="form-group">
           <label htmlFor="name">Nombre del Mercado:</label>
@@ -116,7 +116,7 @@ const MarketCreate: React.FC = () => {
             required
           />
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="event">Evento:</label>
           {eventsLoading ? (
@@ -137,7 +137,7 @@ const MarketCreate: React.FC = () => {
             </select>
           )}
         </div>
-        
+
         <div className="form-group">
           <label>Selecciones Disponibles:</label>
           <div className="selections-container">
@@ -170,7 +170,7 @@ const MarketCreate: React.FC = () => {
             </button>
           </div>
         </div>
-        
+
         <div className="form-actions">
           <Button
             type="button"

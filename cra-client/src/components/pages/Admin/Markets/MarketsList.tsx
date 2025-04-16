@@ -194,11 +194,13 @@ const MarketsList: React.FC = () => {
           <table className="markets-table">
             <thead>
               <tr>
-                <th>Nombre</th>
-                <th>Evento</th>
-                <th>Estado</th>
-                <th>Creado</th>
-                <th>Acciones</th>
+                <th style={{ width: '15%' }}>Nombre</th>
+                <th style={{ width: '15%' }}>Evento</th>
+                <th style={{ width: '12%' }}>Fecha y Hora</th>
+                <th style={{ width: '15%' }}>Participantes</th>
+                <th style={{ width: '8%' }}>Estado</th>
+                <th style={{ width: '15%' }}>Creado</th>
+                <th style={{ width: '20%' }}>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -217,14 +219,41 @@ const MarketsList: React.FC = () => {
                   </td>
                   <td>{market.event?.name || 'N/A'}</td>
                   <td>
-                    <span className={getStatusBadgeClass(market.status)}>
-                      {getStatusText(market.status)}
+                    {market.event?.startTime ? (
+                      <span className="event-datetime">
+                        {new Date(market.event.startTime).toLocaleDateString()}
+                        <br />
+                        {new Date(market.event.startTime).toLocaleTimeString()}
+                      </span>
+                    ) : (
+                      'N/A'
+                    )}
+                  </td>
+                  <td>
+                    {market.event?.participants && market.event.participants.length > 0 ? (
+                      <div className="participants-list">
+                        {market.event.participants.map((participant, index) => (
+                          <div key={index} className="participant-item">
+                            {participant.name}
+                            {index < market.event!.participants!.length - 1 && ' vs '}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      'N/A'
+                    )}
+                  </td>
+                  <td>
+                    <span className={getStatusBadgeClass(market.status)} title={getStatusText(market.status)}>
+                      {getStatusText(market.status).substring(0, 3)}
                     </span>
                   </td>
                   <td>{new Date(market.createdAt).toLocaleString()}</td>
                   <td className="actions-cell">
                     <Button
                       onClick={() => navigate(`/admin/markets/${market.id}`)}
+                      size="sm"
+                      aria-label="Ver detalles del mercado"
                     >
                       Ver
                     </Button>
@@ -233,15 +262,19 @@ const MarketsList: React.FC = () => {
                       <>
                         <Button
                           variant="warning"
+                          size="sm"
                           onClick={() => handleStatusChange(market.id, 'suspend')}
+                          aria-label="Suspender mercado"
                         >
-                          Suspender
+                          Susp
                         </Button>
                         <Button
                           variant="danger"
+                          size="sm"
                           onClick={() => handleStatusChange(market.id, 'close')}
+                          aria-label="Cerrar mercado"
                         >
-                          Cerrar
+                          Cerr
                         </Button>
                       </>
                     )}
@@ -249,18 +282,22 @@ const MarketsList: React.FC = () => {
                     {market.status === 'SUSPENDED' && (
                       <Button
                         variant="success"
+                        size="sm"
                         onClick={() => handleStatusChange(market.id, 'reopen')}
+                        aria-label="Reactivar mercado"
                       >
-                        Reactivar
+                        React
                       </Button>
                     )}
 
                     {(market.status === 'OPEN' || market.status === 'SUSPENDED') && (
                       <Button
                         variant="danger"
+                        size="sm"
                         onClick={() => handleStatusChange(market.id, 'cancel')}
+                        aria-label="Cancelar mercado"
                       >
-                        Cancelar
+                        Canc
                       </Button>
                     )}
                   </td>
