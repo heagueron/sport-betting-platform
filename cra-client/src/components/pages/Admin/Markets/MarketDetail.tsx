@@ -30,11 +30,33 @@ const MarketDetail: React.FC = () => {
       setMarket(response.data);
 
       // Obtener las selecciones disponibles
-      // Nota: Esto es un ejemplo, deberías adaptar esto según cómo estén estructuradas las selecciones en tu API
-      if (response.data.event && response.data.event.participants) {
-        setSelections(response.data.event.participants.map((p: any) => p.name));
+      // Primero intentamos obtener las selecciones de las apuestas existentes
+      const uniqueSelections = new Set<string>();
+
+      if (response.data.bets && response.data.bets.length > 0) {
+        response.data.bets.forEach((bet: any) => {
+          if (bet.selection) {
+            uniqueSelections.add(bet.selection);
+          }
+        });
       }
 
+      // Si no hay apuestas, intentamos obtener las selecciones de los participantes del evento
+      if (uniqueSelections.size === 0 && response.data.event && response.data.event.participants) {
+        response.data.event.participants.forEach((p: any) => {
+          if (p.name) {
+            uniqueSelections.add(p.name);
+          }
+        });
+      }
+
+      // Si aún no tenemos selecciones, usamos un valor por defecto
+      if (uniqueSelections.size === 0) {
+        uniqueSelections.add('Opción 1');
+        uniqueSelections.add('Opción 2');
+      }
+
+      setSelections(Array.from(uniqueSelections));
       setError(null);
     } catch (err) {
       console.error('Error fetching market details:', err);
@@ -85,6 +107,8 @@ const MarketDetail: React.FC = () => {
     }
   };
 
+
+
   const handleSettleMarket = async () => {
     if (!selectedWinner) {
       setError('Debes seleccionar una opción ganadora');
@@ -95,17 +119,32 @@ const MarketDetail: React.FC = () => {
       return;
     }
 
+    // Mostrar el ID del mercado en la consola para depuración
+    console.log('Intentando liquidar mercado con ID:', marketId);
+    console.log('Tipo de marketId:', typeof marketId);
+    console.log('Selección ganadora:', selectedWinner);
+
     setActionLoading(true);
     setError(null);
     setSuccessMessage(null);
 
     try {
+      // Intentar obtener el mercado primero para verificar que existe
+      const checkResponse = await adminService.getMarketById(marketId);
+      console.log('Mercado encontrado:', checkResponse.data);
+
+      // Ahora intentar liquidar el mercado
       const response = await adminService.settleMarket(marketId, selectedWinner);
       setMarket(response.data);
       setSuccessMessage('Mercado liquidado correctamente');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error settling market:', err);
-      setError('Error al liquidar el mercado. Por favor, inténtalo de nuevo.');
+      // Mostrar mensaje de error más específico si está disponible
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(`Error al liquidar el mercado: ${err.response.data.message}`);
+      } else {
+        setError('Error al liquidar el mercado. Por favor, inténtalo de nuevo.');
+      }
     } finally {
       setActionLoading(false);
     }
@@ -245,6 +284,7 @@ const MarketDetail: React.FC = () => {
           {(market.status === 'CLOSED') && (
             <div className="settle-market-section">
               <h3>Liquidar Mercado</h3>
+
               <div className="settle-form">
                 <div className="form-group">
                   <label htmlFor="winner-select">Seleccionar Ganador:</label>

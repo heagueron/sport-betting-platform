@@ -79,19 +79,21 @@ model Participant {
 
 // Mercado de apuestas
 model Market {
-  id          String       @id @default(uuid())
-  name        String       // Ej: "Ganador del partido"
-  status      MarketStatus @default(OPEN)
-  version     Int          @default(1)      // Campo para bloqueo optimista
-  locked      Boolean      @default(false)  // Campo para bloqueo pesimista
-  lockedAt    DateTime?                     // Timestamp del bloqueo
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id               String       @id @default(uuid())
+  name             String       // Ej: "Ganador del partido"
+  status           MarketStatus @default(OPEN)
+  winningSelection String?      // Selección ganadora cuando el mercado está liquidado
+  version          Int          @default(1)      // Campo para bloqueo optimista
+  locked           Boolean      @default(false)  // Campo para bloqueo pesimista
+  lockedAt         DateTime?                     // Timestamp del bloqueo
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  settledAt        DateTime?                     // Fecha de liquidación
 
-  eventId     String
-  event       Event        @relation(fields: [eventId], references: [id])
+  eventId          String
+  event            Event        @relation(fields: [eventId], references: [id])
 
-  bets        Bet[]
+  bets             Bet[]
 
   @@map("markets")
 }

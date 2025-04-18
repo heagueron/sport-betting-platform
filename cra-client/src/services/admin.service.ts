@@ -68,6 +68,20 @@ export interface EventResponse {
   data: Event;
 }
 
+// Interfaces para la gestión de apuestas
+export interface Bet {
+  id: string;
+  amount: number;
+  odds: number;
+  selection: string;
+  status: string;
+  type: 'BACK' | 'LAY';
+  matchedAmount: number;
+  createdAt: string;
+  updatedAt: string;
+  settledAt?: string;
+}
+
 // Interfaces para la gestión de mercados
 export interface Market {
   id: string;
@@ -79,6 +93,7 @@ export interface Market {
   createdAt: string;
   updatedAt: string;
   settledAt?: string;
+  bets?: Bet[];
 }
 
 export interface MarketListResponse {
@@ -199,6 +214,12 @@ const adminService = {
     return response.data;
   },
 
+  // Completar un evento
+  completeEvent: async (eventId: string): Promise<EventResponse> => {
+    const response = await apiClient.put<EventResponse>(`/events/${eventId}/complete`, {});
+    return response.data;
+  },
+
   // ===== MERCADOS =====
   // Obtener todos los mercados
   getMarkets: async (params?: {
@@ -256,8 +277,18 @@ const adminService = {
 
   // Liquidar un mercado
   settleMarket: async (marketId: string, winningSelection: string): Promise<MarketResponse> => {
-    const response = await apiClient.put<MarketResponse>(`/markets/${marketId}/settle`, { winningSelection });
-    return response.data;
+    console.log('Service: Intentando liquidar mercado con ID:', marketId);
+    console.log('Service: URL completa:', `/markets/${marketId}/settle`);
+    console.log('Service: Datos enviados:', { winningSelection });
+
+    try {
+      const response = await apiClient.put<MarketResponse>(`/markets/${marketId}/settle`, { winningSelection });
+      console.log('Service: Respuesta recibida:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Service: Error al liquidar mercado:', error);
+      throw error;
+    }
   },
 };
 

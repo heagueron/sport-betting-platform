@@ -81,7 +81,8 @@ export const getAllMarkets = async (
     include: {
       event: {
         include: {
-          sport: true
+          sport: true,
+          participants: true
         }
       }
     },
@@ -261,10 +262,8 @@ export const settleMarket = async (
     throw new Error('Market is already settled');
   }
 
-  // Check if event is completed
-  if (market.event.status !== 'COMPLETED') {
-    throw new Error('Event must be completed before settling market');
-  }
+  // No longer requiring event to be completed
+  // Markets can be settled independently of event status
 
   // Get all matched bets for this market
   const matchedBets = market.bets.filter(
@@ -275,7 +274,11 @@ export const settleMarket = async (
     // Update market status to settled
     await prisma.market.update({
       where: { id: marketId },
-      data: { status: MarketStatus.SETTLED }
+      data: {
+        status: MarketStatus.SETTLED,
+        winningSelection: winningSelection,
+        settledAt: new Date()
+      }
     });
     return 0;
   }
@@ -318,53 +321,81 @@ export const settleMarket = async (
 
       // Update user balance if bet won with optimistic locking
       if (result === 'WON') {
-        await tx.user.update({
-          where: {
-            id: bet.userId,
-            version: bet.user.version // Asegurar que nadie más ha modificado el usuario
-          },
-          data: {
-            balance: bet.user.balance + winnings,
-            availableBalance: bet.user.availableBalance + winnings,
-            version: { increment: 1 } // Incrementar la versión
-          }
-        });
+        try {
+          // Verificar si el usuario existe antes de intentar actualizarlo
+          const userExists = await tx.user.findUnique({
+            where: { id: bet.userId }
+          });
 
-        // Registrar la transacción de ganancias
-        await tx.transaction.create({
-          data: {
-            userId: bet.userId,
-            type: 'WINNING' as TransactionType,
-            amount: winnings,
-            status: 'COMPLETADA' as TransactionStatus,
-            description: `Ganancias por apuesta ${bet.type} en ${bet.selection} a cuota ${bet.odds}`
+          if (userExists) {
+            await tx.user.update({
+              where: {
+                id: bet.userId,
+                version: bet.user.version // Asegurar que nadie más ha modificado el usuario
+              },
+              data: {
+                balance: bet.user.balance + winnings,
+                availableBalance: bet.user.availableBalance + winnings,
+                version: { increment: 1 } // Incrementar la versión
+              }
+            });
+
+            // Registrar la transacción de ganancias
+            await tx.transaction.create({
+              data: {
+                userId: bet.userId,
+                type: 'WINNING' as TransactionType,
+                amount: winnings,
+                status: 'COMPLETADA' as TransactionStatus,
+                description: `Ganancias por apuesta ${bet.type} en ${bet.selection} a cuota ${bet.odds}`
+              }
+            });
+          } else {
+            console.warn(`Usuario con ID ${bet.userId} no encontrado al actualizar balance por apuesta ganada`);
           }
-        });
+        } catch (error) {
+          console.error(`Error al actualizar balance del usuario ${bet.userId} por apuesta ganada:`, error);
+          // Continuar con la liquidación del mercado a pesar del error
+        }
       }
 
       // Release reserved balance for lay bets
       if (bet.type === 'LAY' && bet.liability) {
-        await tx.user.update({
-          where: {
-            id: bet.userId,
-            version: bet.user.version // Asegurar que nadie más ha modificado el usuario
-          },
-          data: {
-            reservedBalance: bet.user.reservedBalance - bet.liability,
-            version: { increment: 1 } // Incrementar la versión
-          }
-        });
+        try {
+          // Verificar si el usuario existe antes de intentar actualizarlo
+          const userExists = await tx.user.findUnique({
+            where: { id: bet.userId }
+          });
 
-        // Registrar la transacción de liberación de fondos
-        await tx.transaction.create({
-          data: {
-            userId: bet.userId,
-            type: 'RELEASE' as TransactionType,
-            amount: bet.liability,
-            status: 'COMPLETADA' as TransactionStatus,
-            description: `Liberación de fondos reservados para apuesta LAY en ${bet.selection}`
+          if (userExists) {
+            await tx.user.update({
+              where: {
+                id: bet.userId,
+                version: bet.user.version // Asegurar que nadie más ha modificado el usuario
+              },
+              data: {
+                reservedBalance: bet.user.reservedBalance - bet.liability,
+                version: { increment: 1 } // Incrementar la versión
+              }
+            });
+
+            // Registrar la transacción de liberación de fondos
+            await tx.transaction.create({
+              data: {
+                userId: bet.userId,
+                type: 'RELEASE' as TransactionType,
+                amount: bet.liability,
+                status: 'COMPLETADA' as TransactionStatus,
+                description: `Liberación de fondos reservados para apuesta LAY en ${bet.selection}`
+              }
+            });
+          } else {
+            console.warn(`Usuario con ID ${bet.userId} no encontrado al liberar fondos reservados para apuesta LAY`);
           }
-        });
+        } catch (error) {
+          console.error(`Error al liberar fondos reservados para apuesta LAY del usuario ${bet.userId}:`, error);
+          // Continuar con la liquidación del mercado a pesar del error
+        }
       }
 
       settledCount++;
@@ -378,6 +409,8 @@ export const settleMarket = async (
       },
       data: {
         status: MarketStatus.SETTLED,
+        winningSelection: winningSelection,
+        settledAt: new Date(),
         version: { increment: 1 } // Incrementar la versión
       }
     });

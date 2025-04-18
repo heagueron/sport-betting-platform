@@ -119,6 +119,74 @@ export const updateMarketStatus = catchAsync(
 );
 
 /**
+ * Suspend market
+ * @route PUT /api/markets/:id/suspend
+ */
+export const suspendMarket = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const marketId = req.params.id;
+
+    const market = await marketService.updateMarketStatus(marketId, MarketStatus.SUSPENDED);
+
+    res.status(200).json({
+      success: true,
+      data: market
+    });
+  }
+);
+
+/**
+ * Reopen market
+ * @route PUT /api/markets/:id/reopen
+ */
+export const reopenMarket = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const marketId = req.params.id;
+
+    const market = await marketService.updateMarketStatus(marketId, MarketStatus.OPEN);
+
+    res.status(200).json({
+      success: true,
+      data: market
+    });
+  }
+);
+
+/**
+ * Close market
+ * @route PUT /api/markets/:id/close
+ */
+export const closeMarket = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const marketId = req.params.id;
+
+    const market = await marketService.updateMarketStatus(marketId, MarketStatus.CLOSED);
+
+    res.status(200).json({
+      success: true,
+      data: market
+    });
+  }
+);
+
+/**
+ * Cancel market
+ * @route PUT /api/markets/:id/cancel
+ */
+export const cancelMarket = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const marketId = req.params.id;
+
+    const market = await marketService.updateMarketStatus(marketId, MarketStatus.CANCELLED);
+
+    res.status(200).json({
+      success: true,
+      data: market
+    });
+  }
+);
+
+/**
  * Settle market
  * @route PUT /api/markets/:id/settle
  */
@@ -131,15 +199,19 @@ export const settleMarket = catchAsync(
       return next(new AppError('Winning selection is required', 400));
     }
 
-    const settledCount = await marketService.settleMarket(marketId, winningSelection);
+    // Liquidar el mercado
+    await marketService.settleMarket(marketId, winningSelection);
+
+    // Obtener el mercado actualizado para devolverlo en la respuesta
+    const updatedMarket = await marketService.getMarketById(marketId);
+
+    if (!updatedMarket) {
+      return next(new AppError('Market not found after settlement', 404));
+    }
 
     res.status(200).json({
       success: true,
-      data: {
-        marketId,
-        winningSelection,
-        settledCount
-      }
+      data: updatedMarket
     });
   }
 );

@@ -128,9 +128,14 @@ const MarketsList: React.FC = () => {
     <div className="markets-list-container">
       <div className="markets-list-header">
         <h1>Gestión de Mercados</h1>
-        <Button onClick={() => navigate('/admin/markets/create')}>
-          Crear Nuevo Mercado
-        </Button>
+        <div className="header-buttons">
+          <Button onClick={() => navigate('/admin/markets/create')}>
+            Crear Nuevo Mercado
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/admin/markets/settlements')}>
+            Ver Historial de Liquidaciones
+          </Button>
+        </div>
       </div>
 
       <div className="markets-filters">

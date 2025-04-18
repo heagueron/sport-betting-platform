@@ -395,6 +395,25 @@ export const createTestEvent = async (): Promise<Event> => {
 };
 
 /**
+ * Create a market
+ * @param eventId Event ID
+ * @param overrides Optional overrides for market properties
+ * @returns Created market
+ */
+export const createMarket = async (eventId: string, overrides: any = {}): Promise<any> => {
+  const marketData = {
+    name: `Test Market ${Date.now()}`,
+    status: 'OPEN',
+    eventId,
+    ...overrides
+  };
+
+  return prisma.market.create({
+    data: marketData
+  });
+};
+
+/**
  * Create a test market for bet matching tests
  * @param eventId Event ID
  * @returns Created market
