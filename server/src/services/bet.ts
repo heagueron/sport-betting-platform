@@ -374,20 +374,36 @@ export const cancelUnmatchedBet = async (
  * Get all bets
  * @param page Page number
  * @param limit Items per page
+ * @param marketId Optional market ID to filter by
+ * @param eventId Optional event ID to filter by
+ * @param status Optional status to filter by
+ * @param type Optional type to filter by (BACK or LAY)
  * @returns List of bets with pagination info
  */
 export const getAllBets = async (
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  marketId?: string,
+  eventId?: string,
+  status?: string,
+  type?: 'BACK' | 'LAY'
 ): Promise<{ bets: Bet[]; total: number; page: number; pages: number }> => {
   // Calculate pagination
   const skip = (page - 1) * limit;
 
+  // Build where clause
+  const where: any = {};
+  if (marketId) where.marketId = marketId;
+  if (eventId) where.eventId = eventId;
+  if (status) where.status = status;
+  if (type) where.type = type;
+
   // Get total count
-  const total = await prisma.bet.count();
+  const total = await prisma.bet.count({ where });
 
   // Get bets
   const bets = await prisma.bet.findMany({
+    where,
     include: {
       user: {
         select: {

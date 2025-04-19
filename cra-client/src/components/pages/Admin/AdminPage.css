@@ -48,6 +48,12 @@
   margin-bottom: 20px;
 }
 
+.button-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .admin-footer {
   margin-top: 40px;
   display: flex;
@@ -78,7 +84,7 @@
   .admin-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .admin-container {
     padding: 15px;
   }

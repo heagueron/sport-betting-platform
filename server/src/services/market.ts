@@ -1,4 +1,4 @@
-import { Market, MarketStatus, TransactionStatus, TransactionType } from '@prisma/client';
+import { Market, MarketStatus, TransactionStatus, TransactionType, BetStatus } from '@prisma/client';
 import * as concurrencyService from './concurrency';
 import prisma from '../config/prisma';
 import { MarketData } from '../types';
@@ -314,7 +314,7 @@ export const settleMarket = async (
       await tx.bet.update({
         where: { id: bet.id },
         data: {
-          status: result === 'WON' ? 'WON' : 'LOST',
+          status: result === 'WON' ? BetStatus.WON : BetStatus.LOST,
           settledAt: new Date()
         }
       });

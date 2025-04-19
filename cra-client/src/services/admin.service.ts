@@ -77,6 +77,18 @@ export interface Bet {
   status: string;
   type: 'BACK' | 'LAY';
   matchedAmount: number;
+  liability?: number;
+  potentialWinnings: number;
+  userId: string;
+  user?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
+  eventId: string;
+  event?: Event;
+  marketId: string;
+  market?: Market;
   createdAt: string;
   updatedAt: string;
   settledAt?: string;
@@ -110,6 +122,23 @@ export interface MarketListResponse {
 export interface MarketResponse {
   success: boolean;
   data: Market;
+}
+
+// Interfaces para el libro de órdenes
+export interface OrderBookEntry {
+  odds: number;
+  totalAmount: number;
+  bets: Bet[];
+}
+
+export interface OrderBook {
+  backBets: OrderBookEntry[];
+  layBets: OrderBookEntry[];
+}
+
+export interface OrderBookResponse {
+  success: boolean;
+  data: OrderBook;
 }
 
 
@@ -289,6 +318,27 @@ const adminService = {
       console.error('Service: Error al liquidar mercado:', error);
       throw error;
     }
+  },
+
+  // ===== APUESTAS =====
+  // Obtener todas las apuestas
+  getBets: async (params?: {
+    marketId?: string;
+    eventId?: string;
+    status?: string;
+    type?: 'BACK' | 'LAY';
+    page?: number;
+    limit?: number;
+  }): Promise<{ success: boolean; data: Bet[]; pagination?: { page: number; limit: number; total: number; pages: number } }> => {
+    const response = await apiClient.get('/bets', { params });
+    return response.data;
+  },
+
+  // Obtener el libro de órdenes para un mercado
+  getMarketOrderBook: async (marketId: string, selection?: string): Promise<OrderBookResponse> => {
+    const params = selection ? { selection } : {};
+    const response = await apiClient.get<OrderBookResponse>(`/markets/${marketId}/orderbook`, { params });
+    return response.data;
   },
 };
 

@@ -1,0 +1,188 @@
+.filter-section {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.filter-section h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  color: #343a40;
+}
+
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 200px;
+}
+
+.filter-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 14px;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+  align-self: flex-end;
+}
+
+.action-buttons {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.bets-table-container {
+  margin-top: 20px;
+}
+
+.bets-table-container h2 {
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  color: #343a40;
+}
+
+.bets-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.bets-table th,
+.bets-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.bets-table th {
+  background-color: #e9ecef;
+  font-weight: 600;
+  color: #495057;
+}
+
+.bets-table tr:hover {
+  background-color: #f1f3f5;
+}
+
+.back-type {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.lay-type {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-unmatched {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.status-partially_matched {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.status-fully_matched {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-settled {
+  background-color: #6c757d;
+  color: white;
+}
+
+.status-cancelled {
+  background-color: #dc3545;
+  color: white;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.page-info {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.no-data-message {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 30px 0;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.center-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.admin-footer {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 992px) {
+  .filter-controls {
+    flex-direction: column;
+  }
+  
+  .filter-buttons {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+  
+  .bets-table {
+    display: block;
+    overflow-x: auto;
+  }
+}

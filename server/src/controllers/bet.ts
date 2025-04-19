@@ -161,9 +161,13 @@ export const getBets = catchAsync(
     // Parse query parameters
     const page = parseInt(req.query.page as string || '1', 10);
     const limit = parseInt(req.query.limit as string || '10', 10);
+    const marketId = req.query.marketId as string | undefined;
+    const eventId = req.query.eventId as string | undefined;
+    const status = req.query.status as string | undefined;
+    const type = req.query.type as 'BACK' | 'LAY' | undefined;
 
     // Get bets
-    const result = await getAllBets(page, limit);
+    const result = await getAllBets(page, limit, marketId, eventId, status, type);
 
     res.status(200).json({
       success: true,

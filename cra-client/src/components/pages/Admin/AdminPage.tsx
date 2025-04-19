@@ -105,7 +105,7 @@ const AdminPage: React.FC = () => {
         <div className="admin-card">
           <h2>Apuestas</h2>
           <p>Revisa y gestiona las apuestas realizadas.</p>
-          <div>
+          <div className="button-group">
             <Button
               variant="outline"
               onClick={() => navigate('/admin/bets')}
