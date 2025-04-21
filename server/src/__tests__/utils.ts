@@ -141,14 +141,12 @@ export const createEvent = async (sportId: string, overrides: any = {}): Promise
     prisma.participant.create({
       data: {
         name: `Team A ${uniqueId}`,
-        odds: 1.5,
         eventId: event.id
       }
     }),
     prisma.participant.create({
       data: {
         name: `Team B ${uniqueId}`,
-        odds: 2.5,
         eventId: event.id
       }
     })
@@ -358,24 +356,19 @@ export const createTestEvent = async (): Promise<Event> => {
       participants: {
         create: [
           {
-            name: 'Team A',
-            odds: 2.0
+            name: 'Team A'
           },
           {
-            name: 'Team B',
-            odds: 1.8
+            name: 'Team B'
           },
           {
-            name: 'Team C',
-            odds: 3.0
+            name: 'Team C'
           },
           {
-            name: 'Team D',
-            odds: 4.5
+            name: 'Team D'
           },
           {
-            name: 'Team E',
-            odds: 6.0
+            name: 'Team E'
           }
         ]
       }

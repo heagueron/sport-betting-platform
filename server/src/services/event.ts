@@ -28,7 +28,6 @@ export const createEvent = async (eventData: EventData): Promise<Event & { parti
         tx.participant.create({
           data: {
             name: participant.name,
-            odds: participant.odds,
             eventId: event.id
           }
         })
@@ -52,6 +51,7 @@ export const createEvent = async (eventData: EventData): Promise<Event & { parti
 export const getAllEvents = async (
   status?: EventStatus,
   sportId?: string,
+  search?: string,
   page: number = 1,
   limit: number = 10
 ): Promise<{ events: Event[]; total: number; page: number; pages: number }> => {
@@ -64,6 +64,13 @@ export const getAllEvents = async (
 
   if (sportId) {
     where.sportId = sportId;
+  }
+
+  if (search) {
+    where.name = {
+      contains: search,
+      mode: 'insensitive'
+    };
   }
 
   // Calculate pagination
@@ -272,7 +279,6 @@ export const addParticipant = async (
   return prisma.participant.create({
     data: {
       name: participantData.name,
-      odds: participantData.odds,
       eventId
     }
   });
@@ -302,10 +308,6 @@ export const updateParticipant = async (
 
   if (updateData.name) {
     data.name = updateData.name;
-  }
-
-  if (updateData.odds !== undefined) {
-    data.odds = updateData.odds;
   }
 
   // Update participant

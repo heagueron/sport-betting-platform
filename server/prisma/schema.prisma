@@ -67,7 +67,6 @@ model Event {
 model Participant {
   id        String   @id @default(uuid())
   name      String
-  odds      Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

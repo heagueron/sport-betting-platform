@@ -16,6 +16,17 @@ const EventsList: React.FC = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
 
+  // Estado para la paginación
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalEvents, setTotalEvents] = useState<number>(0);
+  const [eventsPerPage] = useState<number>(10);
+
+  // Estado para filtros y búsqueda
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filterSportId, setFilterSportId] = useState<string>('');
+  const [filterStatus, setFilterStatus] = useState<string>('');
+
   // Estado para controlar qué dropdowns están abiertos
   const [openDropdowns, setOpenDropdowns] = useState<{[key: string]: boolean}>({});
 
@@ -28,20 +39,37 @@ const EventsList: React.FC = () => {
   const [eventFormat, setEventFormat] = useState<'HEAD_TO_HEAD' | 'MULTI_PARTICIPANT'>('HEAD_TO_HEAD');
 
   // Estado para los participantes
-  const [participants, setParticipants] = useState<{ name: string; odds: string }[]>([]);
+  const [participants, setParticipants] = useState<{ name: string }[]>([]);
   const [participantName, setParticipantName] = useState<string>('');
-  const [participantOdds, setParticipantOdds] = useState<string>('');
 
   useEffect(() => {
-    fetchEvents();
+    fetchEvents(currentPage);
     fetchSports();
-  }, []);
+  }, [currentPage, searchTerm, filterSportId, filterStatus]);
 
-  const fetchEvents = async () => {
+  const fetchEvents = async (page: number = 1) => {
     try {
       setLoading(true);
-      const response = await adminService.getEvents();
+
+      // Preparar los parámetros de filtro
+      const params: any = {};
+
+      if (searchTerm.trim()) {
+        params.search = searchTerm.trim();
+      }
+
+      if (filterSportId) {
+        params.sportId = filterSportId;
+      }
+
+      if (filterStatus) {
+        params.status = filterStatus;
+      }
+
+      const response = await adminService.getEvents(page, eventsPerPage, params);
       setEvents(response.data);
+      setTotalPages(response.pagination?.pages || 1);
+      setTotalEvents(response.pagination?.total || 0);
       setError(null);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Error al cargar los eventos');
@@ -49,6 +77,32 @@ const EventsList: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Resetear a la primera página cuando se busca
+  };
+
+  const handleSportFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilterSportId(e.target.value);
+    setCurrentPage(1); // Resetear a la primera página cuando se filtra
+  };
+
+  const handleStatusFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilterStatus(e.target.value);
+    setCurrentPage(1); // Resetear a la primera página cuando se filtra
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setFilterSportId('');
+    setFilterStatus('');
+    setCurrentPage(1);
   };
 
   const fetchSports = async () => {
@@ -68,6 +122,12 @@ const EventsList: React.FC = () => {
       return;
     }
 
+    // Validar que la fecha de finalización no sea anterior a la fecha de inicio
+    if (endTime && new Date(endTime) < new Date(startTime)) {
+      setFormError('La fecha de finalización no puede ser anterior a la fecha de inicio');
+      return;
+    }
+
     // Validar el número de participantes según el formato del evento
     if (eventFormat === 'HEAD_TO_HEAD' && participants.length !== 2) {
       setFormError('Los eventos uno contra uno deben tener exactamente 2 participantes');
@@ -81,10 +141,9 @@ const EventsList: React.FC = () => {
       setFormError(null);
       setFormSuccess(null);
 
-      // Convertir las odds de string a number
+      // Formatear los participantes
       const formattedParticipants = participants.map(p => ({
-        name: p.name,
-        odds: parseFloat(p.odds)
+        name: p.name
       }));
 
       await adminService.createEvent({
@@ -107,7 +166,8 @@ const EventsList: React.FC = () => {
       setFormSuccess('Evento creado correctamente');
 
       // Recargar la lista de eventos
-      fetchEvents();
+      fetchEvents(1);
+      setCurrentPage(1);
     } catch (err: any) {
       setFormError(err.response?.data?.error || 'Error al crear el evento');
       console.error('Error creating event:', err);
@@ -115,15 +175,8 @@ const EventsList: React.FC = () => {
   };
 
   const handleAddParticipant = () => {
-    if (!participantName.trim() || !participantOdds.trim()) {
-      setFormError('El nombre y las cuotas del participante son obligatorios');
-      return;
-    }
-
-    // Validar que las cuotas sean un número válido
-    const odds = parseFloat(participantOdds);
-    if (isNaN(odds) || odds <= 1) {
-      setFormError('Las cuotas deben ser un número mayor que 1');
+    if (!participantName.trim()) {
+      setFormError('El nombre del participante es obligatorio');
       return;
     }
 
@@ -133,14 +186,13 @@ const EventsList: React.FC = () => {
       return;
     }
 
-    setParticipants([
-      ...participants,
-      { name: participantName, odds: participantOdds }
-    ]);
+    // Añadir el nuevo participante a la lista
+    const newParticipants = [...participants, { name: participantName }];
+    setParticipants(newParticipants);
+    console.log('Participantes actualizados:', newParticipants);
 
     // Limpiar los campos
     setParticipantName('');
-    setParticipantOdds('');
     setFormError(null);
   };
 
@@ -211,6 +263,55 @@ const EventsList: React.FC = () => {
     <div className="events-list-container">
       <div className="events-list-header">
         <h1>Gestión de Eventos</h1>
+        <div className="events-list-filters">
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            <button className="search-icon">
+              <i className="fas fa-search"></i>
+            </button>
+          </div>
+
+          <div className="filter-group">
+            <select
+              value={filterSportId}
+              onChange={handleSportFilterChange}
+              className="filter-select"
+            >
+              <option value="">Todos los deportes</option>
+              {sports.map(sport => (
+                <option key={sport.id} value={sport.id}>
+                  {sport.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={filterStatus}
+              onChange={handleStatusFilterChange}
+              className="filter-select"
+            >
+              <option value="">Todos los estados</option>
+              <option value="SCHEDULED">Programados</option>
+              <option value="LIVE">En vivo</option>
+              <option value="COMPLETED">Completados</option>
+              <option value="CANCELLED">Cancelados</option>
+            </select>
+
+            {(searchTerm || filterSportId || filterStatus) && (
+              <button
+                className="clear-filters-btn"
+                onClick={clearFilters}
+              >
+                Limpiar filtros
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       {error && (
@@ -307,18 +408,22 @@ const EventsList: React.FC = () => {
                 <p className="form-help-text">Debe agregar al menos 2 participantes.</p>
 
                 <div className="participants-list">
-                  {participants.map((participant, index) => (
-                    <div key={index} className="participant-item">
-                      <span>{participant.name} - Cuota: {participant.odds}</span>
-                      <button
-                        type="button"
-                        className="remove-participant-btn"
-                        onClick={() => handleRemoveParticipant(index)}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
+                  {participants.length === 0 ? (
+                    <p className="no-participants">No hay participantes añadidos</p>
+                  ) : (
+                    participants.map((participant, index) => (
+                      <div key={index} className="participant-item">
+                        <span>{participant.name}</span>
+                        <button
+                          type="button"
+                          className="remove-participant-btn"
+                          onClick={() => handleRemoveParticipant(index)}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))
+                  )}
                 </div>
 
                 <div className="add-participant-form">
@@ -328,14 +433,12 @@ const EventsList: React.FC = () => {
                       placeholder="Nombre del participante"
                       value={participantName}
                       onChange={(e) => setParticipantName(e.target.value)}
-                    />
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="1.01"
-                      placeholder="Cuota (ej: 1.5)"
-                      value={participantOdds}
-                      onChange={(e) => setParticipantOdds(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddParticipant();
+                        }
+                      }}
                     />
                   </div>
                   <button
@@ -371,11 +474,19 @@ const EventsList: React.FC = () => {
       </div>
 
       <div className="events-list-stats">
-        <p>Total de eventos: {events.length}</p>
-        <p>Programados: {events.filter(event => event.status === 'SCHEDULED').length}</p>
-        <p>En vivo: {events.filter(event => event.status === 'LIVE').length}</p>
-        <p>Completados: {events.filter(event => event.status === 'COMPLETED').length}</p>
-        <p>Cancelados: {events.filter(event => event.status === 'CANCELLED').length}</p>
+        <p>Mostrando {events.length} de {totalEvents} eventos</p>
+        {(searchTerm || filterSportId || filterStatus) && (
+          <p className="filter-info">
+            Filtros activos:
+            {searchTerm && <span className="filter-tag">Búsqueda: "{searchTerm}"</span>}
+            {filterSportId && <span className="filter-tag">Deporte: {sports.find(s => s.id === filterSportId)?.name}</span>}
+            {filterStatus && (
+              <span className="filter-tag">
+                Estado: {getStatusLabel(filterStatus)}
+              </span>
+            )}
+          </p>
+        )}
       </div>
 
       <div className="events-list">
@@ -427,7 +538,6 @@ const EventsList: React.FC = () => {
                       {event.participants.map((participant, index) => (
                         <div key={index} className="participant-item-row">
                           <span className="participant-name">{participant.name}</span>
-                          <span className="participant-odds">Cuota: {participant.odds}</span>
                         </div>
                       ))}
                     </div>
@@ -438,6 +548,50 @@ const EventsList: React.FC = () => {
           )}
         </div>
       </div>
+
+      {totalPages > 1 && (
+        <div className="events-list-pagination">
+          <button
+            className="pagination-button"
+            onClick={() => handlePageChange(1)}
+            disabled={currentPage === 1}
+          >
+            &laquo;
+          </button>
+          <button
+            className="pagination-button"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            &lsaquo;
+          </button>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+            <button
+              key={page}
+              className={`pagination-button ${currentPage === page ? 'active' : ''}`}
+              onClick={() => handlePageChange(page)}
+            >
+              {page}
+            </button>
+          ))}
+
+          <button
+            className="pagination-button"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            &rsaquo;
+          </button>
+          <button
+            className="pagination-button"
+            onClick={() => handlePageChange(totalPages)}
+            disabled={currentPage === totalPages}
+          >
+            &raquo;
+          </button>
+        </div>
+      )}
 
       <div className="events-list-footer">
         <Button onClick={() => navigate('/admin')}>

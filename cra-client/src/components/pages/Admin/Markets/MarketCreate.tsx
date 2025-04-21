@@ -25,7 +25,7 @@ const MarketCreate: React.FC = () => {
   const fetchEvents = async () => {
     setEventsLoading(true);
     try {
-      const response = await adminService.getEvents({ status: 'SCHEDULED' });
+      const response = await adminService.getEvents(1, 100, { status: 'SCHEDULED' });
       setEvents(response.data);
     } catch (err) {
       console.error('Error fetching events:', err);

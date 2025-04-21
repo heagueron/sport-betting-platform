@@ -39,7 +39,6 @@ export interface EventData {
  */
 export interface ParticipantData {
   name: string;
-  odds: number;
 }
 
 /**

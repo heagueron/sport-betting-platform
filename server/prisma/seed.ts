@@ -227,17 +227,14 @@ async function createParticipants(event: Event): Promise<void> {
   // Create participants
   for (const name of participantNames) {
     // Generate random odds between 1.1 and 5.0
-    const odds = parseFloat((1.1 + Math.random() * 3.9).toFixed(2));
-
     const participant = await prisma.participant.create({
       data: {
         name,
-        odds,
         eventId: event.id,
       },
     });
 
-    console.log(`Participant created: ${participant.name} with odds ${participant.odds}`);
+    console.log(`Participant created: ${participant.name}`);
   }
 }
 

@@ -14,8 +14,8 @@ describe('Event API', () => {
         sportId: sport.id,
         startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
         participants: [
-          { name: 'Team A', odds: 1.5 },
-          { name: 'Team B', odds: 2.5 }
+          { name: 'Team A' },
+          { name: 'Team B' }
         ]
       };
 
@@ -51,8 +51,8 @@ describe('Event API', () => {
         sportId: sport.id,
         startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         participants: [
-          { name: 'Team A', odds: 1.5 },
-          { name: 'Team B', odds: 2.5 }
+          { name: 'Team A' },
+          { name: 'Team B' }
         ]
       };
 
@@ -76,8 +76,8 @@ describe('Event API', () => {
         sportId: sport.id,
         startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         participants: [
-          { name: 'Team A', odds: 1.5 },
-          { name: 'Team B', odds: 2.5 }
+          { name: 'Team A' },
+          { name: 'Team B' }
         ]
       };
 
@@ -102,8 +102,8 @@ describe('Event API', () => {
         sportId: sport.id,
         startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         participants: [
-          { name: 'Team A', odds: 1.5 },
-          { name: 'Team B', odds: 2.5 }
+          { name: 'Team A' },
+          { name: 'Team B' }
         ]
       };
 
@@ -143,8 +143,8 @@ describe('Event API', () => {
         sportId: '00000000-0000-0000-0000-000000000000',
         startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         participants: [
-          { name: 'Team A', odds: 1.5 },
-          { name: 'Team B', odds: 2.5 }
+          { name: 'Team A' },
+          { name: 'Team B' }
         ]
       };
 
@@ -171,9 +171,9 @@ describe('Event API', () => {
         startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         format: 'HEAD_TO_HEAD',
         participants: [
-          { name: 'Team A', odds: 1.5 },
-          { name: 'Team B', odds: 2.5 },
-          { name: 'Team C', odds: 3.0 }
+          { name: 'Team A' },
+          { name: 'Team B' },
+          { name: 'Team C' }
         ]
       };
 
@@ -200,8 +200,8 @@ describe('Event API', () => {
         startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         format: 'MULTI_PARTICIPANT',
         participants: [
-          { name: 'Team A', odds: 1.5 },
-          { name: 'Team B', odds: 2.5 }
+          { name: 'Team A' },
+          { name: 'Team B' }
         ]
       };
 

@@ -3,7 +3,6 @@ import { z } from 'zod';
 // Schema for participant data
 const participantSchema = z.object({
   name: z.string().min(1, 'Participant name is required'),
-  odds: z.number().positive('Odds must be a positive number'),
 });
 
 // Schema for creating an event
@@ -90,7 +89,6 @@ export const updateParticipantSchema = z.object({
   }),
   body: z.object({
     name: z.string().min(1, 'Participant name is required').optional(),
-    odds: z.number().positive('Odds must be a positive number').optional(),
   }).refine(data => Object.keys(data).length > 0, {
     message: 'At least one field must be provided for update',
   }),

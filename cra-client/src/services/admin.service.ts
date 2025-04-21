@@ -38,7 +38,6 @@ export interface SportResponse {
 export interface Participant {
   id?: string;
   name: string;
-  odds: number;
   eventId?: string;
 }
 
@@ -61,6 +60,12 @@ export interface EventListResponse {
   success: boolean;
   count: number;
   data: Event[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
 }
 
 export interface EventResponse {
@@ -220,8 +225,9 @@ const adminService = {
 
   // ===== EVENTOS =====
   // Obtener todos los eventos
-  getEvents: async (params?: { sportId?: string; status?: string }): Promise<EventListResponse> => {
-    const response = await apiClient.get<EventListResponse>('/events', { params });
+  getEvents: async (page: number = 1, limit: number = 10, params?: { sportId?: string; status?: string }): Promise<EventListResponse> => {
+    const queryParams = { page, limit, ...params };
+    const response = await apiClient.get<EventListResponse>('/events', { params: queryParams });
     return response.data;
   },
 

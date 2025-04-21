@@ -232,7 +232,6 @@ const EventDetail: React.FC = () => {
                   {event.participants.map((participant, index) => (
                     <div key={index} className="participant-item-row">
                       <span className="participant-name">{participant.name}</span>
-                      <span className="participant-odds">Cuota: {participant.odds}</span>
                     </div>
                   ))}
                 </div>

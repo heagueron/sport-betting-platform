@@ -52,10 +52,10 @@ export const createNewEvent = async (
 
     // Validate participants
     for (const participant of participants) {
-      if (!participant.name || participant.odds === undefined) {
+      if (!participant.name) {
         return res.status(400).json({
           success: false,
-          error: 'Each participant must have a name and odds'
+          error: 'Each participant must have a name'
         });
       }
     }
@@ -101,6 +101,7 @@ export const getEvents = async (
     // Parse query parameters
     const statusParam = req.query.status as string | undefined;
     const sportId = req.query.sportId as string | undefined;
+    const search = req.query.search as string | undefined;
     const page = parseInt(req.query.page as string || '1', 10);
     const limit = parseInt(req.query.limit as string || '10', 10);
 
@@ -118,7 +119,7 @@ export const getEvents = async (
     }
 
     // Get events
-    const result = await getAllEvents(status, sportId, page, limit);
+    const result = await getAllEvents(status, sportId, search, page, limit);
 
     res.status(200).json({
       success: true,
@@ -338,18 +339,18 @@ export const addEventParticipant = async (
 ) => {
   try {
     const eventId = req.params.id;
-    const { name, odds } = req.body;
+    const { name } = req.body;
 
     // Validate input
-    if (!name || odds === undefined) {
+    if (!name) {
       return res.status(400).json({
         success: false,
-        error: 'Please provide name and odds'
+        error: 'Please provide name'
       });
     }
 
     // Add participant
-    const participant = await addParticipant(eventId, { name, odds });
+    const participant = await addParticipant(eventId, { name });
 
     // Check if event exists
     if (!participant) {
@@ -378,18 +379,18 @@ export const updateEventParticipant = async (
 ) => {
   try {
     const participantId = req.params.id;
-    const { name, odds } = req.body;
+    const { name } = req.body;
 
-    // Check if at least one field is provided
-    if (!name && odds === undefined) {
+    // Check if name is provided
+    if (!name) {
       return res.status(400).json({
         success: false,
-        error: 'Please provide at least one field to update'
+        error: 'Please provide a name to update'
       });
     }
 
     // Update participant
-    const updatedParticipant = await updateParticipant(participantId, { name, odds });
+    const updatedParticipant = await updateParticipant(participantId, { name });
 
     // Check if participant exists
     if (!updatedParticipant) {
